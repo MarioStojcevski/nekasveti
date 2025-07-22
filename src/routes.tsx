@@ -37,6 +37,8 @@ const router = createBrowserRouter([
     path: '*',
     Component: () => <div>404 Not Found</div>,
   }
-]);
+], {
+  basename: '/nekasveti/',
+});
 
 export default router;

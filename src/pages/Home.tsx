@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <Box>
       <Button onClick={() => navigate('/services')} variant="contained" color="primary">
-        Click Me
+        anastasija
       </Button>
     </Box>
   );
