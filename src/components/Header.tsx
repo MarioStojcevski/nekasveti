@@ -11,7 +11,7 @@ const Header = () => {
 
   return (
     <Box sx={{ flexGrow: 1}}>
-      <AppBar position="static">
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton size="large" edge="start" color="inherit" aria-label="menu">
             <TipsAndUpdatesIcon />
@@ -25,7 +25,7 @@ const Header = () => {
             {headerTitles[pathname.replace(/\/$/, '')]}
           </Typography>
           <Typography variant="body1">
-            nekasveti.mk
+            нека свети
           </Typography>
         </Toolbar>
       </AppBar>

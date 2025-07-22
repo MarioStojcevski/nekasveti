@@ -1,6 +1,5 @@
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import type { Service } from "../types";
 import { useAppContext } from "../context/AppContext";
 
 const Summary = () => {
@@ -8,19 +7,29 @@ const Summary = () => {
   const { services } = useAppContext();
 
   return (
-    <div className="summary">
-      <h2>Summary</h2>
+    <Box>
+      <Typography variant="h4" textAlign="center" marginTop={5}>
+        Резиме на услугите
+      </Typography>
+      <Box display="flex" flexDirection="column" alignItems="center" marginTop={3}>
+        {services.length === 0 ? (
+          <Typography variant="body1">Нема избрани услуги.</Typography>
+        ) : (
+          services.map((service) => (
+            <Box key={service.id} marginBottom={2} textAlign="center">
+              <Typography variant="h6">{service.name}</Typography>
+              <Typography variant="body1">Количество: {service.quantity}</Typography>
+              <Typography variant="body1">Цена: {service.price} ден.</Typography>
+            </Box>
+          ))
+        )}
+      </Box>
+      <Typography variant="h5" textAlign="center" marginTop={3}>
+        Вкупна цена: {services.reduce((total, service) => total + (service.price * (service.quantity || 1)), 0)} ден.
+      </Typography>
 
-      <ul>
-        {services.map((service: Service) => (
-          <li key={service.id}>
-            {service.name} - {service.description} - ${service.price} - {service.duration} mins
-          </li>
-        ))}
-      </ul>
-
-      <Button onClick={() => navigate('/')} >Done</Button>
-    </div>
+      <Button variant="contained" fullWidth onClick={() => navigate('/')} >Done</Button>
+    </Box>
   )
 };
 

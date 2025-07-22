@@ -4,6 +4,7 @@ type Service = {
   price: number;
   description: string;
   duration: number;
+  quantity?: number;
 };
 
 export type { Service };

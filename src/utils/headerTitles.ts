@@ -1,8 +1,8 @@
 const headerTitles: Record<string, string> = {
   "/": "",
-  "/services": "Services",
-  "/schedule": "Schedule",
-  "/summary": "Summary",
+  "/services": "Услуги",
+  "/schedule": "Термин",
+  "/summary": "Преглед",
 };
 
 export default headerTitles;

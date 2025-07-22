@@ -13,6 +13,8 @@ const App = () => {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
+          paddingLeft: 10,
+          paddingRight: 10,
         }}
       >
         <Outlet />
