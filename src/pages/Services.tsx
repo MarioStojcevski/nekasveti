@@ -8,7 +8,6 @@ const ServicePicker = () => {
   const navigate = useNavigate();
   const { services, setServices } = useAppContext();
 
-  // Helper function to update the service quantity
   const updateServiceQuantity = (serviceId: string, increment: boolean) => {
     const service = allServices.find((s: Service) => s.id === serviceId);
     if (!service) return;
@@ -16,7 +15,6 @@ const ServicePicker = () => {
     const existingService = services.find((s: Service) => s.id === serviceId);
     
     if (existingService) {
-      // If increment, increase quantity
       if (increment) {
         setServices(
           services.map((s: Service) =>
@@ -26,8 +24,7 @@ const ServicePicker = () => {
           )
         );
       } else {
-        // If decrement, decrease quantity or remove service if quantity reaches 0
-        if (existingService.quantity > 1) {
+        if (existingService.quantity && existingService.quantity > 1) {
           setServices(
             services.map((s: Service) =>
               s.id === serviceId
@@ -36,12 +33,10 @@ const ServicePicker = () => {
             )
           );
         } else {
-          // Remove service from the list when quantity is 0
           setServices(services.filter((s: Service) => s.id !== serviceId));
         }
       }
     } else if (increment) {
-      // Add the service if it doesn't exist and increment
       setServices([...services, { ...service, quantity: 1 }]);
     }
   };
@@ -56,7 +51,6 @@ const ServicePicker = () => {
       
       <Box>
         {allServices.map((service: Service) => {
-          // Find the service in the current selected services to get the quantity
           const selectedService = services.find((s: Service) => s.id === service.id);
 
           return (
@@ -70,7 +64,7 @@ const ServicePicker = () => {
                 Цена: {service.price} ден.
               </Typography>
 
-              {selectedService?.quantity > 0 && (
+              {selectedService?.quantity && selectedService?.quantity > 0 && (
                 <Typography variant="body2" marginBottom={2}>
                   Количина: {selectedService?.quantity}
                 </Typography>
