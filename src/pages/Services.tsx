@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Card, Typography } from "@mui/material";
-
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
 import type { Service } from "../types";
@@ -9,15 +8,40 @@ const ServicePicker = () => {
   const navigate = useNavigate();
   const { services, setServices } = useAppContext();
 
-  const addService = (serviceId: string) => {
+  // Helper function to update the service quantity
+  const updateServiceQuantity = (serviceId: string, increment: boolean) => {
     const service = allServices.find((s: Service) => s.id === serviceId);
     if (!service) return;
+
     const existingService = services.find((s: Service) => s.id === serviceId);
+    
     if (existingService) {
-      setServices(services.map((s: Service) => 
-        s.id === serviceId ? { ...s, quantity: (s.quantity || 0) + 1 } : s
-      ));
-    } else {
+      // If increment, increase quantity
+      if (increment) {
+        setServices(
+          services.map((s: Service) =>
+            s.id === serviceId
+              ? { ...s, quantity: (s.quantity || 0) + 1 }
+              : s
+          )
+        );
+      } else {
+        // If decrement, decrease quantity or remove service if quantity reaches 0
+        if (existingService.quantity > 1) {
+          setServices(
+            services.map((s: Service) =>
+              s.id === serviceId
+                ? { ...s, quantity: (s.quantity || 1) - 1 }
+                : s
+            )
+          );
+        } else {
+          // Remove service from the list when quantity is 0
+          setServices(services.filter((s: Service) => s.id !== serviceId));
+        }
+      }
+    } else if (increment) {
+      // Add the service if it doesn't exist and increment
       setServices([...services, { ...service, quantity: 1 }]);
     }
   };
@@ -29,51 +53,73 @@ const ServicePicker = () => {
           Изберете услуги за хемиско чистење и притиснете "Следно" за да продолжите.
         </Typography>
       </Box>
+      
       <Box>
-        {allServices.map((service: Service) => (
-          <Card key={service.id} sx={{ marginBottom: 2, padding: 2 }} >
-            <Typography variant="h6">{service.name}</Typography>
-            <img src="./sponge.jpg" height={100} />
-            <Typography variant="body1" marginBottom={2}>
-              {service.description}
-            </Typography>
-            <Typography variant="body2" color="textSecondary" marginBottom={2}>
-              Цена: {service.price} ден.
-            </Typography>
-              <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
+        {allServices.map((service: Service) => {
+          // Find the service in the current selected services to get the quantity
+          const selectedService = services.find((s: Service) => s.id === service.id);
+
+          return (
+            <Card key={service.id} sx={{ marginBottom: 2, padding: 2 }}>
+              <Typography variant="h6">{service.name}</Typography>
+              <img src="./sponge.jpg" height={100} alt={service.name} />
+              <Typography variant="body1" marginBottom={2}>
+                {service.description}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" marginBottom={2}>
+                Цена: {service.price} ден.
+              </Typography>
+
+              {selectedService?.quantity > 0 && (
+                <Typography variant="body2" marginBottom={2}>
+                  Количина: {selectedService?.quantity}
+                </Typography>
+              )}
+
+              {(!selectedService?.quantity || selectedService?.quantity === 0) ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => updateServiceQuantity(service.id, true)} // Add more of the service
+                  fullWidth
+                >
+                  Додади услуга
+                </Button>
+              ) :
+              (
+                <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => addService(service.id)}
+                  onClick={() => updateServiceQuantity(service.id, true)} // Increase quantity
                   fullWidth
                 >
                   +
                 </Button>
+                
                 <Button
                   variant="outlined"
                   color="secondary"
-                  onClick={() => setServices(services.filter((s: Service) => s.id !== service.id))}
+                  onClick={() => updateServiceQuantity(service.id, false)} // Decrease quantity or remove
                   fullWidth
+                  disabled={!selectedService?.quantity}
                 >
                   -
                 </Button>
               </Box>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => addService(service.id)}
-                fullWidth
-              >
-                Додади услуга
-              </Button>
-          </Card>
-        ))}
+              )}
+            </Card>
+          );
+        })}
       </Box>
+
       <Box display="flex" marginBottom={4}>
-        <Button variant="contained" fullWidth onClick={() => navigate('/schedule')} >Следно</Button>
+        <Button variant="contained" fullWidth onClick={() => navigate('/schedule')}>
+          Следно
+        </Button>
       </Box>
     </Box>
   );
 };
 
-export default ServicePicker;
+export default ServicePicker; 
