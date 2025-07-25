@@ -6,19 +6,44 @@ import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { useAppContext } from "../context/AppContext";
 
 const Schedule = () => {
-  const {calendarValue, setCalendarValue} = useAppContext();
+  const { calendarValue, setCalendarValue } = useAppContext();
   const navigate = useNavigate();
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center">
-      <img src="./vacuum.jpg" height={300} />
-      <Typography variant="body1" marginTop={2}>
+    <Box display="flex" flexDirection="column" alignItems="center" padding={2}>
+      <img src="./vacuum.jpg" height={150} alt="Vacuum Cleaner" />
+      <Typography variant="body1" marginTop={3} textAlign="center" sx={{ fontWeight: 300 }}>
         Изберете датум и време за хемиско чистење
       </Typography>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DateCalendar value={calendarValue} onChange={(newValue) => setCalendarValue(newValue)} />
-      </LocalizationProvider>
-      <Button variant="contained" onClick={() => navigate('/summary')} sx={{ marginTop: 5}}>Следно</Button>
+      
+      <Box marginTop={3}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateCalendar
+            value={calendarValue}
+            onChange={(newValue) => setCalendarValue(newValue)}
+            sx={{
+              borderRadius: '10px',
+              boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+            }}
+          />
+        </LocalizationProvider>
+      </Box>
+      
+      <Button
+        variant="contained"
+        onClick={() => navigate('/summary')}
+        sx={{
+          marginTop: 10,
+          padding: '12px',
+          backgroundColor: '#2e58ffff',
+          '&:hover': { backgroundColor: '#1a318cff' },
+          textTransform: 'uppercase',
+          borderRadius: '10px',
+          width: '100%',
+        }}
+      >
+        Следно
+      </Button>
     </Box>
   );
 };

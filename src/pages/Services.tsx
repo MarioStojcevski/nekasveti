@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { Box, Button, Card, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
 import type { Service } from "../types";
@@ -42,9 +42,19 @@ const ServicePicker = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" marginTop={200}>
-      <Box>
-        <Typography variant="subtitle1" textAlign="justify" marginBottom={6}>
+    <Box display="flex" flexDirection="column" padding={2}>
+      <Box marginBottom={6}>
+        <Typography 
+          variant="subtitle1" 
+          textAlign="center" 
+          color="text.primary" 
+          marginBottom={6}
+          sx={{
+            fontWeight: 300, 
+            lineHeight: 1.5,
+            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+          }}
+        >
           Изберете услуги за хемиско чистење и притиснете "Следно" за да продолжите.
         </Typography>
       </Box>
@@ -55,7 +65,9 @@ const ServicePicker = () => {
 
           return (
             <Card key={service.id} sx={{ marginBottom: 2, padding: 2 }}>
-              <Typography variant="h6">{service.name}</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 400 }}>
+                {service.name}
+              </Typography>
               <img src="./sponge.jpg" height={100} alt={service.name} />
               <Typography variant="body1" marginBottom={2}>
                 {service.description}
@@ -65,50 +77,99 @@ const ServicePicker = () => {
               </Typography>
 
               {selectedService?.quantity && selectedService?.quantity > 0 && (
-                <Typography variant="body2" marginBottom={2}>
+                <Box
+                  sx={{
+                    backgroundColor: '#ffeb3b', // Light yellow to make it pop out
+                    color: '#000', // Black text for contrast
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '18px',
+                    fontWeight: '500',
+                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                    marginBottom: 2,
+                    textAlign: 'center',
+                    width: 'fit-content',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                  }}
+                >
                   Количина: {selectedService?.quantity}
-                </Typography>
+                </Box>
               )}
 
               {(!selectedService?.quantity || selectedService?.quantity === 0) ? (
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => updateServiceQuantity(service.id, true)} // Add more of the service
-                  fullWidth
+                  onClick={() => updateServiceQuantity(service.id, true)} 
+                  sx={{
+                    backgroundColor: '#2e58ffff',
+                    '&:hover': { backgroundColor: '#1a318cff' },
+                    textTransform: 'uppercase',
+                    borderRadius: '10px',
+                    padding: '12px',
+                    margin: 'auto',
+                    maxWidth: 400,
+                  }}
                 >
                   Додади услуга
                 </Button>
               ) :
               (
                 <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => updateServiceQuantity(service.id, true)} // Increase quantity
-                  fullWidth
-                >
-                  +
-                </Button>
                 
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => updateServiceQuantity(service.id, false)} // Decrease quantity or remove
-                  fullWidth
-                  disabled={!selectedService?.quantity}
-                >
-                  -
-                </Button>
-              </Box>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => updateServiceQuantity(service.id, false)} 
+                    disabled={!selectedService?.quantity}
+                    sx={{
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      '&:hover': { backgroundColor: '#45a049' },
+                      maxWidth: 150,
+                      margin: 'auto',
+                    }}
+                  >
+                    -
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => updateServiceQuantity(service.id, true)} 
+                    sx={{
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textTransform: 'none',
+                      '&:hover': { backgroundColor: '#1a318cff' },
+                      maxWidth: 150,
+                      margin: 'auto',
+                    }}
+                  >
+                    +
+                  </Button>
+                </Box>
               )}
             </Card>
           );
         })}
       </Box>
 
-      <Box display="flex" marginBottom={4}>
-        <Button variant="contained" fullWidth onClick={() => navigate('/schedule')}>
+      <Box display="flex" marginBottom={4} sx={{ marginTop: 4 }}>
+        <Button
+          variant="contained"
+          onClick={() => navigate('/schedule')}
+          sx={{
+            backgroundColor: '#2e58ffff',
+            '&:hover': { backgroundColor: '#1a318cff' },
+            textTransform: 'uppercase',
+            padding: '12px',
+            width: '100%',
+            margin: 'auto',
+          }}
+        >
           Следно
         </Button>
       </Box>
@@ -116,4 +177,4 @@ const ServicePicker = () => {
   );
 };
 
-export default ServicePicker; 
+export default ServicePicker;
