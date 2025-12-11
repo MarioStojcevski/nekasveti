@@ -6,13 +6,16 @@ import type { PickerValue } from "@mui/x-date-pickers/internals";
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [calendarValue, setCalendarValue] = useState<PickerValue>(null);
+  const [timeValue, setTimeValue] = useState<PickerValue>(null);
 
   const values = useMemo(() => ({
     services,
     setServices,
     calendarValue,
-    setCalendarValue
-  }), [calendarValue, services]);
+    setCalendarValue,
+    timeValue,
+    setTimeValue
+  }), [calendarValue, services, timeValue]);
 
   return (
     <AppContext.Provider value={values}>

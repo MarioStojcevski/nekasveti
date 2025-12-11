@@ -1,8 +1,24 @@
-import { Box, Button, Card, Typography } from "@mui/material";
+import { Box, Button, Card, Typography, Container, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
 import type { Service } from "../types";
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+
+// Map service IDs to appropriate chemical cleaning images
+const getServiceImage = (serviceId: string): string => {
+  const imageMap: Record<string, string> = {
+    "service2": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80", // Чистење на теписи - Carpet cleaning with steam
+    "service3": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на фотеља - Armchair/sofa cleaning
+    "service4": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на двосед - Two-seater sofa cleaning
+    "service5": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на тросед - Three-seater sofa cleaning
+    "service6": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80", // Чистење на спална + душек - Mattress cleaning
+    "service7": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на столче - Chair cleaning
+    "service8": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80", // Чистење на канцелариски стол - Office desk cleaning
+  };
+  return imageMap[serviceId] || "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80";
+};
 
 const ServicePicker = () => {
   const navigate = useNavigate();
@@ -42,138 +58,274 @@ const ServicePicker = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" padding={2}>
-      <Box marginBottom={6}>
-        <Typography 
-          variant="subtitle1" 
-          textAlign="center" 
-          color="text.primary" 
-          marginBottom={6}
-          sx={{
-            fontWeight: 300, 
-            lineHeight: 1.5,
-            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
-          }}
-        >
-          Изберете услуги за хемиско чистење и притиснете "Следно" за да продолжите.
-        </Typography>
-      </Box>
+    <Container maxWidth="lg" sx={{ width: '100%', py: { xs: 2, sm: 4 } }}>
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        width="100%"
+        sx={{ gap: 4 }}
+      >
+        {/* Header Section */}
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Typography 
+            variant="h3"
+            sx={{
+              fontSize: { xs: '1.75rem', sm: '2.5rem' },
+              fontWeight: 800,
+              color: '#2c3e50',
+              mb: 2,
+            }}
+          >
+            Избери Услуги
+          </Typography>
+          <Typography 
+            variant="body1"
+            sx={{
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              color: '#64748b',
+              maxWidth: '600px',
+              mx: 'auto',
+            }}
+          >
+            Изберете услуги за хемиско чистење и притиснете "Следно" за да продолжите.
+          </Typography>
+        </Box>
       
-      <Box>
-        {allServices.map((service: Service) => {
-          const selectedService = services.find((s: Service) => s.id === service.id);
-
-          return (
-            <Card key={service.id} sx={{ marginBottom: 2, padding: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 400 }}>
-                {service.name}
-              </Typography>
-              <img src="./sponge.jpg" height={100} alt={service.name} />
-              <Typography variant="body1" marginBottom={2}>
-                {service.description}
-              </Typography>
-              <Typography variant="body2" color="textSecondary" marginBottom={2}>
-                Цена: {service.price} ден.
-              </Typography>
-
-              {selectedService?.quantity && selectedService?.quantity > 0 && (
-                <Box
-                  sx={{
-                    backgroundColor: '#ffeb3b', // Light yellow to make it pop out
-                    color: '#000', // Black text for contrast
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '18px',
-                    fontWeight: '500',
-                    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                    marginBottom: 2,
-                    textAlign: 'center',
-                    width: 'fit-content',
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                  }}
-                >
-                  Количина: {selectedService?.quantity}
-                </Box>
-              )}
-
-              {(!selectedService?.quantity || selectedService?.quantity === 0) ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => updateServiceQuantity(service.id, true)} 
-                  sx={{
-                    backgroundColor: '#2e58ffff',
-                    '&:hover': { backgroundColor: '#1a318cff' },
-                    textTransform: 'uppercase',
-                    borderRadius: '10px',
-                    padding: '12px',
-                    margin: 'auto',
-                    maxWidth: 400,
-                  }}
-                >
-                  Додади услуга
-                </Button>
-              ) :
-              (
-                <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
-                
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => updateServiceQuantity(service.id, false)} 
-                    disabled={!selectedService?.quantity}
-                    sx={{
-                      padding: '12px',
-                      borderRadius: '10px',
-                      textTransform: 'none',
-                      '&:hover': { backgroundColor: '#45a049' },
-                      maxWidth: 150,
-                      margin: 'auto',
-                    }}
-                  >
-                    -
-                  </Button>
-
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => updateServiceQuantity(service.id, true)} 
-                    sx={{
-                      padding: '12px',
-                      borderRadius: '10px',
-                      textTransform: 'none',
-                      '&:hover': { backgroundColor: '#1a318cff' },
-                      maxWidth: 150,
-                      margin: 'auto',
-                    }}
-                  >
-                    +
-                  </Button>
-                </Box>
-              )}
-            </Card>
-          );
-        })}
-      </Box>
-
-      <Box display="flex" marginBottom={4} sx={{ marginTop: 4 }}>
-        <Button
-          variant="contained"
-          onClick={() => navigate('/schedule')}
-          sx={{
-            backgroundColor: '#2e58ffff',
-            '&:hover': { backgroundColor: '#1a318cff' },
-            textTransform: 'uppercase',
-            padding: '12px',
+        {/* Services Grid */}
+        <Box 
+          sx={{ 
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+            gap: { xs: 2, sm: 3 },
             width: '100%',
-            margin: 'auto',
           }}
         >
-          Следно
-        </Button>
+          {allServices.map((service: Service) => {
+            const selectedService = services.find((s: Service) => s.id === service.id);
+            const isSelected = selectedService?.quantity && selectedService.quantity > 0;
+
+            return (
+              <Card 
+                key={service.id} 
+                sx={{ 
+                  padding: { xs: 2, sm: 3 },
+                  borderRadius: '20px',
+                  background: isSelected 
+                    ? '#f8f9fa'
+                    : '#ffffff',
+                  border: isSelected 
+                    ? '2px solid #2c3e50' 
+                    : '1px solid #ecf0f1',
+                  boxShadow: isSelected 
+                    ? '0 8px 32px rgba(44, 62, 80, 0.15)' 
+                    : '0 4px 16px rgba(0, 0, 0, 0.06)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': isSelected ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: '#2c3e50',
+                  } : {},
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)',
+                  },
+                }}
+              >
+                <Box sx={{ mb: 2 }}>
+                  <Box
+                    component="img"
+                    src={getServiceImage(service.id)}
+                    alt={service.name}
+                    sx={{
+                      width: '100%',
+                      height: { xs: '180px', sm: '200px' },
+                      objectFit: 'cover',
+                      borderRadius: '16px',
+                      mb: 2,
+                    }}
+                  />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        fontWeight: 700,
+                        fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                        color: '#1a202c',
+                      }}
+                    >
+                      {service.name}
+                    </Typography>
+                    <Chip
+                      label={`${service.price} ден.`}
+                      sx={{
+                        background: '#2c3e50',
+                        color: 'white',
+                        fontWeight: 700,
+                        fontSize: '0.875rem',
+                      }}
+                    />
+                  </Box>
+                  <Typography 
+                    variant="body2"
+                    sx={{
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                      color: '#64748b',
+                      lineHeight: 1.6,
+                      mb: 2,
+                    }}
+                  >
+                    {service.description}
+                  </Typography>
+                </Box>
+
+                {isSelected && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2,
+                      p: 1.5,
+                      background: '#2c3e50',
+                      borderRadius: '12px',
+                      color: 'white',
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 700, fontSize: '1.125rem' }}>
+                      Количина: {selectedService.quantity}
+                    </Typography>
+                  </Box>
+                )}
+
+                {!isSelected ? (
+                  <Button
+                    variant="contained"
+                    onClick={() => updateServiceQuantity(service.id, true)} 
+                    fullWidth
+                    startIcon={<AddIcon />}
+                    sx={{
+                      background: '#2c3e50',
+                      borderRadius: '12px',
+                      padding: { xs: '12px', sm: '14px' },
+                      fontSize: { xs: '0.875rem', sm: '1rem' },
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
+                      '&:hover': { 
+                        background: '#34495e',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
+                      },
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                  >
+                    Додади услуга
+                  </Button>
+                ) : (
+                  <Box 
+                    display="flex" 
+                    gap={1.5}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() => updateServiceQuantity(service.id, false)} 
+                      fullWidth
+                      startIcon={<RemoveIcon />}
+                      sx={{
+                        borderColor: '#2c3e50',
+                        color: '#2c3e50',
+                        borderRadius: '12px',
+                        padding: { xs: '12px', sm: '14px' },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        '&:hover': { 
+                          backgroundColor: '#f8f9fa',
+                          borderColor: '#34495e',
+                          transform: 'translateY(-2px)',
+                        },
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      Намали
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => updateServiceQuantity(service.id, true)} 
+                      fullWidth
+                      startIcon={<AddIcon />}
+                      sx={{
+                        background: '#2c3e50',
+                        borderRadius: '12px',
+                        padding: { xs: '12px', sm: '14px' },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
+                        '&:hover': { 
+                          background: '#34495e',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
+                        },
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    >
+                      Зголеми
+                    </Button>
+                  </Box>
+                )}
+              </Card>
+            );
+          })}
+        </Box>
+
+        {/* Next Button */}
+        <Box 
+          sx={{ 
+            position: 'sticky',
+            bottom: { xs: 16, sm: 24 },
+            zIndex: 10,
+            mt: 2,
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={() => navigate('/schedule')}
+            fullWidth
+            disabled={services.length === 0}
+            sx={{
+              background: '#2c3e50',
+              borderRadius: '16px',
+              padding: { xs: '16px', sm: '20px' },
+              fontSize: { xs: '1rem', sm: '1.125rem' },
+              fontWeight: 700,
+              textTransform: 'none',
+              letterSpacing: '0.5px',
+              color: 'white',
+              boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
+              '&:hover': { 
+                background: '#34495e',
+                transform: 'translateY(-4px)',
+                boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
+              },
+              '&:disabled': {
+                background: '#e2e8f0',
+                color: '#94a3b8',
+              },
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            Продолжи со избор на датум →
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </Container>
   );
 };
 

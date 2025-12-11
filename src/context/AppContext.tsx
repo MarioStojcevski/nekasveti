@@ -7,6 +7,8 @@ type AppContextType = {
   setServices: (services: Service[]) => void,
   calendarValue: PickerValue | null;
   setCalendarValue: (value: PickerValue | null) => void;
+  timeValue: PickerValue | null;
+  setTimeValue: (value: PickerValue | null) => void;
 };
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
