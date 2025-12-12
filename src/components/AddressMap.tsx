@@ -7,25 +7,21 @@ import {
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SearchIcon from "@mui/icons-material/Search";
+import type { Map, Marker, LeafletMouseEvent } from "leaflet";
 
 interface AddressMapProps {
   location: { lat: number; lng: number; address: string } | null;
   onLocationChange: (location: { lat: number; lng: number; address: string }) => void;
 }
 
-declare global {
-  interface Window {
-    L: typeof L;
-  }
-}
 
 const AddressMap = ({ location, onLocationChange }: AddressMapProps) => {
   const [address, setAddress] = useState(location?.address || "");
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
+  const mapRef = useRef<Map | null>(null);
+  const markerRef = useRef<Marker | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,7 +69,7 @@ const AddressMap = ({ location, onLocationChange }: AddressMapProps) => {
         });
 
         // When map is clicked, move marker
-        mapRef.current.on("click", (e: L.LeafletMouseEvent) => {
+        mapRef.current.on("click", (e: LeafletMouseEvent) => {
           if (markerRef.current && e.latlng) {
             markerRef.current.setLatLng(e.latlng);
             reverseGeocode(e.latlng.lat, e.latlng.lng);
