@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 import { useAppContext } from "../context/AppContext";
@@ -10,7 +11,7 @@ import dayjs from "dayjs";
 
 const Summary = () => {
   const navigate = useNavigate();
-  const { services, calendarValue, timeValue } = useAppContext();
+  const { services, calendarValue, timeValue, location } = useAppContext();
   const formattedDate = calendarValue ? dayjs(calendarValue).format('DD MMMM YYYY') : null;
   const formattedTime = timeValue ? dayjs(timeValue).format('HH:mm') : null;
   const totalPrice = services.reduce((total, service) => total + (service.price * (service.quantity || 1)), 0);
@@ -231,6 +232,43 @@ const Summary = () => {
                 </Typography>
               </Box>
             </Box>
+
+            {/* Location */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: '12px',
+                  background: '#2c3e50',
+                  mr: 2,
+                }}
+              >
+                <LocationOnIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography 
+                  variant="body2"
+                  sx={{
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    color: '#64748b',
+                    mb: 0.5,
+                  }}
+                >
+                  Адреса за хемиско чистење
+                </Typography>
+                <Typography 
+                  variant="h6"
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: { xs: '1rem', sm: '1.125rem' },
+                    color: '#1a202c',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {location?.address || 'Адресата не е поставена'}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Card>
 
@@ -282,7 +320,7 @@ const Summary = () => {
             variant="contained"
             fullWidth
             onClick={() => navigate('/')}
-            disabled={services.length === 0 || !formattedDate || !formattedTime}
+            disabled={services.length === 0 || !formattedDate || !formattedTime || !location}
             sx={{
               background: '#2c3e50',
               borderRadius: '16px',

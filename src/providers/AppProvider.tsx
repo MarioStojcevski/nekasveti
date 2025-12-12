@@ -7,6 +7,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [calendarValue, setCalendarValue] = useState<PickerValue>(null);
   const [timeValue, setTimeValue] = useState<PickerValue>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
 
   const values = useMemo(() => ({
     services,
@@ -14,8 +15,10 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     calendarValue,
     setCalendarValue,
     timeValue,
-    setTimeValue
-  }), [calendarValue, services, timeValue]);
+    setTimeValue,
+    location,
+    setLocation
+  }), [calendarValue, services, timeValue, location]);
 
   return (
     <AppContext.Provider value={values}>

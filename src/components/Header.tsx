@@ -1,13 +1,24 @@
+import { useState } from "react";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useLocation, useNavigate } from "react-router-dom";
 import SparklesIcon from '@mui/icons-material/AutoAwesome';
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar, Typography, Badge } from "@mui/material";
 
 import headerTitles from "../utils/headerTitles";
+import { useAppContext } from "../context/AppContext";
+import CartModal from "./CartModal";
 
 const Header = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { services } = useAppContext();
+  const [cartOpen, setCartOpen] = useState(false);
+
+  const totalItems = services.reduce(
+    (total, service) => total + (service.quantity || 1),
+    0
+  );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -92,12 +103,42 @@ const Header = () => {
               color: '#7f8c8d',
               display: { xs: 'none', md: 'block' },
               letterSpacing: '1px',
+              mr: 2,
             }}
           >
             нека блеска
           </Typography>
+
+          <Badge
+            badgeContent={totalItems}
+            color="error"
+            sx={{
+              '& .MuiBadge-badge': {
+                background: '#e74c3c',
+                color: 'white',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+              },
+            }}
+          >
+            <IconButton
+              onClick={() => setCartOpen(true)}
+              sx={{
+                background: '#f8f9fa',
+                color: '#2c3e50',
+                '&:hover': {
+                  background: '#ecf0f1',
+                  transform: 'scale(1.05)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <ShoppingCartIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
+            </IconButton>
+          </Badge>
         </Toolbar>
       </AppBar>
+      <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
     </Box>
   );
 };
