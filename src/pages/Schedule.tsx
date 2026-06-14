@@ -4,6 +4,7 @@ import { DayPicker } from "react-day-picker";
 import dayjs from "dayjs";
 import { ArrowRight } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import { supabase } from "../lib/supabase";
 import AddressMap from "../components/AddressMap";
 import TimeSlotGrid from "../components/TimeSlotGrid";
 
@@ -12,21 +13,40 @@ const Schedule = () => {
   const { calendarValue, setCalendarValue, timeValue, setTimeValue, location, setLocation } =
     useAppContext();
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const [month, setMonth] = useState<Date>(new Date());
 
   const selectedDate = calendarValue ? dayjs(calendarValue).toDate() : undefined;
 
-  // Fetch booked slots for the selected date (will wire up to Supabase later)
+  // Fetch all booked dates for the current month
+  useEffect(() => {
+    const firstDay = dayjs(month).startOf("month").format("YYYY-MM-DD");
+    const lastDay = dayjs(month).endOf("month").format("YYYY-MM-DD");
+
+    supabase
+      .from("bookings")
+      .select("date")
+      .gte("date", firstDay)
+      .lte("date", lastDay)
+      .then(({ data }) => {
+        if (data) {
+          const dates = data.map((b) => dayjs(b.date).toDate());
+          setBookedDates(dates);
+        }
+      });
+  }, [month]);
+
+  // Fetch booked time slots for the selected date
   useEffect(() => {
     if (calendarValue) {
-      // Placeholder: no Supabase yet, so bookedSlots stays empty
-      setBookedSlots([]);
-      // When Supabase is connected, this will fetch:
-      // const { data } = await supabase
-      //   .from('bookings')
-      //   .select('time')
-      //   .eq('date', calendarValue);
-      // setBookedSlots(data.map(b => b.time));
+      supabase
+        .from("bookings")
+        .select("time")
+        .eq("date", calendarValue)
+        .then(({ data }) => {
+          if (data) setBookedSlots(data.map((b) => b.time.slice(0, 5)));
+          else setBookedSlots([]);
+        });
     }
   }, [calendarValue]);
 
@@ -65,6 +85,10 @@ const Schedule = () => {
           onMonthChange={setMonth}
           disabled={allDisabled}
           showOutsideDays={false}
+          modifiers={{ hasBooking: bookedDates }}
+          modifiersStyles={{
+            hasBooking: { textDecoration: "underline", textDecorationColor: "#d4a853", textUnderlineOffset: "4px", textDecorationThickness: "2px" },
+          }}
         />
       </div>
 
