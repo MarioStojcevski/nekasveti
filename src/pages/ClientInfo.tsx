@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Phone, Mail, ArrowRight } from "lucide-react";
+import PageBg from "../components/PageBg";
 import { useAppContext } from "../context/AppContext";
 
 const ClientInfo = () => {
@@ -25,6 +26,7 @@ const ClientInfo = () => {
   };
 
   return (
+    <PageBg image="caffee">
     <div className="flex flex-col min-h-full pt-2 pb-4">
       <div className="text-center mb-6">
         <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
@@ -103,6 +105,7 @@ const ClientInfo = () => {
         </button>
       </div>
     </div>
+    </PageBg>
   );
 };
 

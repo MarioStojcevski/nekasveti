@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { DayPicker } from "react-day-picker";
 import dayjs from "dayjs";
 import { ArrowRight } from "lucide-react";
+import PageBg from "../components/PageBg";
 import { useAppContext } from "../context/AppContext";
 import { supabase } from "../lib/supabase";
 import AddressMap from "../components/AddressMap";
@@ -42,16 +43,28 @@ const Schedule = () => {
         .from("bookings")
         .select("time")
         .eq("date", calendarValue)
-        .then(({ data }) => {
-          if (data) setBookedSlots(data.map((b) => b.time));
-          else setBookedSlots([]);
+        .then(({ data, error }) => {
+          if (error) {
+            console.error("Failed to fetch booked slots:", error);
+            setBookedSlots([]);
+          } else {
+            setBookedSlots(data?.map((b) => b.time) ?? []);
+          }
         });
+    } else {
+      setBookedSlots([]);
     }
   }, [calendarValue]);
 
   const handleDateSelect = (date: Date | undefined) => {
     setCalendarValue(date ? dayjs(date).format("YYYY-MM-DD") : null);
   };
+
+  useEffect(() => {
+    if (timeValue && bookedSlots.includes(timeValue)) {
+      setTimeValue(null);
+    }
+  }, [bookedSlots, timeValue, setTimeValue]);
 
   const maxDate = dayjs().add(60, "day").toDate();
 
@@ -62,6 +75,7 @@ const Schedule = () => {
   };
 
   return (
+    <PageBg image="balcony">
     <div className="flex flex-col h-full pt-2">
       <div ref={scrollRef} className="flex-1 overflow-y-auto pb-28 space-y-3 px-0">
         <div className="text-center mb-1">
@@ -109,6 +123,7 @@ const Schedule = () => {
         </button>
       </div>
     </div>
+    </PageBg>
   );
 };
 

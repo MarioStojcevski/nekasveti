@@ -13,7 +13,7 @@ const App = () => {
   const showBottomNav = !isHome && !isConfirmation && !isAdmin;
 
   return (
-    <div className="min-h-screen bg-page-900 flex flex-col">
+    <div className="min-h-screen bg-transparent flex flex-col">
       <Header onCartOpen={() => setCartOpen(true)} />
       <main
         className={`flex-1 w-full max-w-lg mx-auto px-4 ${

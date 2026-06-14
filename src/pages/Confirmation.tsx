@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Home } from "lucide-react";
+import PageBg from "../components/PageBg";
 import { useAppContext } from "../context/AppContext";
 
 const Confirmation = () => {
@@ -27,6 +28,7 @@ const Confirmation = () => {
   };
 
   return (
+    <PageBg image="skopje">
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-4 text-center">
       <div
         className={`transition-all duration-700 ease-out ${
@@ -83,6 +85,7 @@ const Confirmation = () => {
         </button>
       </div>
     </div>
+    </PageBg>
   );
 };
 

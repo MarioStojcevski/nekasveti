@@ -10,6 +10,7 @@ import {
   Wallet,
   Loader2,
 } from "lucide-react";
+import PageBg from "../components/PageBg";
 import dayjs from "dayjs";
 import { useAppContext } from "../context/AppContext";
 import { supabase } from "../lib/supabase";
@@ -57,6 +58,19 @@ const Summary = () => {
     };
 
     try {
+      const { data: existing } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("date", calendarValue)
+        .eq("time", timeValue)
+        .maybeSingle();
+
+      if (existing) {
+        setError("Овој термин е веќе резервиран. Изберете друг датум или термин.");
+        setSubmitting(false);
+        return;
+      }
+
       const { data, error: insertError } = await supabase
         .from("bookings")
         .insert([bookingData])
@@ -80,6 +94,7 @@ const Summary = () => {
   };
 
   return (
+    <PageBg image="office">
     <div className="flex flex-col gap-3 pt-2 pb-4">
       <div className="text-center mb-1">
         <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
@@ -212,6 +227,7 @@ const Summary = () => {
         </button>
       </div>
     </div>
+    </PageBg>
   );
 };
 

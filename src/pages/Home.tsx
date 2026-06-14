@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Zap, ShieldCheck, Target } from "lucide-react";
+import PageBg from "../components/PageBg";
 
 const features = [
   { icon: Zap, text: "Брзо и ефикасно", desc: "Закажи за 2 минути" },
@@ -11,6 +12,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
+    <PageBg image="funky">
     <div className="flex flex-col items-center justify-between min-h-[calc(100vh-4rem)] pt-6 sm:pt-12">
       <div className="flex-1 flex flex-col items-center justify-center px-4 w-full">
         <div className="relative mb-6">
@@ -60,6 +62,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+    </PageBg>
   );
 };
 

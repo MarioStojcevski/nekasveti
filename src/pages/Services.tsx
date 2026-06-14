@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Plus, Minus, ShoppingBag } from "lucide-react";
+import PageBg from "../components/PageBg";
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
 
@@ -52,6 +53,7 @@ const Services = () => {
   const totalPrice = services.reduce((sum, s) => sum + s.price * (s.quantity || 1), 0);
 
   return (
+    <PageBg image="carpet">
     <div className="flex flex-col min-h-full pt-2 pb-4">
       <div className="text-center mb-4">
         <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
@@ -153,6 +155,7 @@ const Services = () => {
         </div>
       </div>
     </div>
+    </PageBg>
   );
 };
 
