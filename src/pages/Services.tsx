@@ -84,22 +84,19 @@ const Services = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold text-text-100 leading-tight truncate">
+                    <h3 className="text-sm sm:text-base font-semibold text-text-100 leading-tight break-words">
                       {service.name}
                     </h3>
                     <span className="text-xs font-bold text-copper-400 whitespace-nowrap mt-0.5">
                       {service.price} ден.
                     </span>
                   </div>
-                  <p className="text-xs text-text-500 mt-1 line-clamp-2 leading-relaxed">
-                    {service.description}
-                  </p>
 
-                  <div className="flex items-center gap-2 mt-2.5">
+                  <div className="mt-auto pt-2">
                     {qty > 0 ? (
-                      <>
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => updateQuantity(service.id, false)}
                           className="w-8 h-8 rounded-lg bg-page-600 text-text-400 hover:text-copper-400 flex items-center justify-center transition-colors active:scale-90"
@@ -115,13 +112,14 @@ const Services = () => {
                         >
                           <Plus size={14} />
                         </button>
-                      </>
+                      </div>
                     ) : (
                       <button
                         onClick={() => updateQuantity(service.id, true)}
-                        className="text-xs font-medium text-copper-400 hover:text-copper-300 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-copper-400/50 text-copper-400 text-xs font-semibold hover:bg-copper-400/10 transition-colors active:scale-95 w-fit"
                       >
-                        + Додади услуга
+                        <Plus size={14} />
+                        Додади
                       </button>
                     )}
                   </div>

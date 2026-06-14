@@ -17,6 +17,7 @@ const AdminLogin = () => {
 
     if (username === adminUser && password === adminPass) {
       sessionStorage.setItem("admin_session", "true");
+      sessionStorage.setItem("admin_username", username);
       navigate("/admin");
     } else {
       setError("Погрешно корисничко име или лозинка");

@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShoppingCart, Sparkles } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Sparkles, Phone } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
-import headerTitles from "../utils/headerTitles";
 
 const Header = ({ onCartOpen }: { onCartOpen: () => void }) => {
   const { pathname } = useLocation();
@@ -39,10 +38,14 @@ const Header = ({ onCartOpen }: { onCartOpen: () => void }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          {!isHome && !isAdmin && (
-            <span className="text-sm text-text-400 font-medium hidden sm:block">
-              {headerTitles[pathname.replace(/\/$/, '')]}
-            </span>
+          {!isAdmin && (
+            <a
+              href="tel:+38971292398"
+              className="flex items-center gap-1.5 text-sm text-copper-400 font-semibold hover:opacity-80 transition-opacity"
+            >
+              <Phone size={13} />
+              +389 71 292 398
+            </a>
           )}
           {!isAdmin && (
             <button

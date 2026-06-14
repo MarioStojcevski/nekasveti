@@ -7,6 +7,7 @@ import Schedule from "./pages/Schedule";
 import ClientInfo from "./pages/ClientInfo";
 import Summary from "./pages/Summary";
 import Confirmation from "./pages/Confirmation";
+import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
       { path: "/confirmation", Component: Confirmation },
       { path: "/admin/login", Component: AdminLogin },
       { path: "/admin", Component: AdminDashboard },
-      { path: "*", Component: () => <div className="text-text-400 text-center py-20">404 Not Found</div> },
+      { path: "*", Component: NotFound },
     ],
   },
 ], {

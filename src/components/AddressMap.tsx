@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MapPin, ChevronDown, ChevronUp } from "lucide-react";
+import { MapPin, Info } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -30,11 +30,9 @@ const AddressMap = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState(location?.address || "");
   const [searching, setSearching] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
-  // Initialize map only when expanded
   useEffect(() => {
-    if (!expanded || !mapContainerRef.current) return;
+    if (!mapContainerRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
       center: location ? [location.lat, location.lng] : defaultCenter,
@@ -67,7 +65,6 @@ const AddressMap = ({
     mapRef.current = map;
     markerRef.current = marker;
 
-    // Delay invalidateSize to ensure container is fully rendered
     requestAnimationFrame(() => {
       map.invalidateSize();
     });
@@ -77,7 +74,7 @@ const AddressMap = ({
       mapRef.current = null;
       markerRef.current = null;
     };
-  }, [expanded]);
+  }, []);
 
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
@@ -140,20 +137,17 @@ const AddressMap = ({
         </button>
       </div>
 
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center justify-between w-full px-3 pb-2 text-xs text-text-500"
-      >
-        <span>{expanded ? "Скриј ја картата" : "Покажи ја картата"}</span>
-        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-      </button>
+      <div className="flex items-start gap-2 px-3 pb-2">
+        <Info size={12} className="text-text-500 mt-0.5 flex-shrink-0" />
+        <p className="text-[11px] text-text-500 leading-relaxed">
+          Најдете ја вашата локација на картата и кликнете за да ја поставите. Не влечете го маркерот.
+        </p>
+      </div>
 
-      {expanded && (
-        <div
-          ref={mapContainerRef}
-          className="h-48 sm:h-64 w-full"
-        />
-      )}
+      <div
+        ref={mapContainerRef}
+        className="h-48 sm:h-64 w-full relative z-0"
+      />
 
       {location && (
         <div className="px-3 pb-3 pt-1">

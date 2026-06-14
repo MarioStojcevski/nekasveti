@@ -43,7 +43,7 @@ const Schedule = () => {
         .select("time")
         .eq("date", calendarValue)
         .then(({ data }) => {
-          if (data) setBookedSlots(data.map((b) => b.time.slice(0, 5)));
+          if (data) setBookedSlots(data.map((b) => b.time));
           else setBookedSlots([]);
         });
     }
