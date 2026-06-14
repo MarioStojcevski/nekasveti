@@ -43,6 +43,7 @@ const TimeSlotGrid = ({
               <Icon size={20} />
               <span className="leading-tight text-center">{label}</span>
               <span className="text-[11px] opacity-70">{value}</span>
+              {booked && <span className="text-[10px] text-red-400 font-semibold">Резервирано</span>}
             </button>
           );
         })}

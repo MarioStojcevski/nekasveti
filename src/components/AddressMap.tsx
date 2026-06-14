@@ -116,8 +116,8 @@ const AddressMap = ({
 
   return (
     <div className="rounded-2xl bg-page-800 border border-page-500/50 overflow-hidden">
-      <div className="flex items-center gap-2 p-3">
-        <div className="flex-1 flex items-center gap-2 bg-page-700 rounded-xl px-3 py-2.5">
+      <div className="flex items-center gap-2 p-3 max-w-full">
+        <div className="flex-1 flex items-center gap-2 bg-page-700 rounded-xl px-3 py-2.5 min-w-0">
           <MapPin size={15} className="text-text-500 flex-shrink-0" />
           <input
             type="text"
@@ -125,13 +125,13 @@ const AddressMap = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="Внеси адреса..."
-            className="flex-1 bg-transparent text-sm text-text-100 outline-none placeholder:text-text-500"
+            className="flex-1 bg-transparent text-sm text-text-100 outline-none placeholder:text-text-500 min-w-0"
           />
         </div>
         <button
           onClick={handleSearch}
           disabled={searching}
-          className="px-4 py-2.5 rounded-xl bg-copper-500 text-text-100 text-xs font-semibold hover:bg-copper-400 disabled:opacity-50 transition-all active:scale-95"
+          className="px-4 py-2.5 rounded-xl bg-copper-500 text-text-100 text-xs font-semibold hover:bg-copper-400 disabled:opacity-50 transition-all active:scale-95 flex-shrink-0"
         >
           {searching ? "..." : "Барај"}
         </button>

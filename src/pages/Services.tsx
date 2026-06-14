@@ -3,18 +3,29 @@ import { Plus, Minus, ShoppingBag } from "lucide-react";
 import PageBg from "../components/PageBg";
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
+import foteljaImg from "../assets/services/fotelja.jpg";
+import dvosedImg from "../assets/services/dvosed.jpg";
+import trosedImg from "../assets/services/trosed.jpg";
+import petosedImg from "../assets/services/petosed.jpg";
+import sestosedImg from "../assets/services/sestosed.jpg";
+import sedmosedImg from "../assets/services/sedmosed.jpg";
+import stolImg from "../assets/services/stol.jpg";
+import taburetkaImg from "../assets/services/taburetka.jpg";
+import kancelariskiImg from "../assets/services/kancelariski.jpg";
+import dusekImg from "../assets/services/dusek.jpg";
 
-const getServiceImage = (serviceId: string): string => {
-  const map: Record<string, string> = {
-    "service2": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80",
-    "service3": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
-    "service4": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
-    "service5": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
-    "service6": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
-    "service7": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
-    "service8": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80",
-  };
-  return map[serviceId] || "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80";
+const serviceImages: Record<string, string> = {
+  s1: foteljaImg,
+  s2: dvosedImg,
+  s3: trosedImg,
+  s4: petosedImg,
+  s5: sestosedImg,
+  s6: sedmosedImg,
+  s7: stolImg,
+  s8: taburetkaImg,
+  s9: kancelariskiImg,
+  s10: dusekImg,
+  s11: dusekImg,
 };
 
 const Services = () => {
@@ -79,9 +90,9 @@ const Services = () => {
               }`}
             >
               <div className="flex gap-3 p-3">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-page-600">
                   <img
-                    src={getServiceImage(service.id)}
+                    src={serviceImages[service.id]}
                     alt={service.name}
                     className="w-full h-full object-cover"
                   />
@@ -91,7 +102,7 @@ const Services = () => {
                     <h3 className="text-sm sm:text-base font-semibold text-text-100 leading-tight break-words">
                       {service.name}
                     </h3>
-                    <span className="text-xs font-bold text-copper-400 whitespace-nowrap mt-0.5">
+                    <span className="text-base font-bold text-copper-400 whitespace-nowrap">
                       {service.price} ден.
                     </span>
                   </div>
