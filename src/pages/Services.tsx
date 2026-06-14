@@ -1,332 +1,166 @@
-import { Box, Button, Card, Typography, Container, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Plus, Minus, ShoppingBag } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
-import type { Service } from "../types";
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 
-// Map service IDs to appropriate chemical cleaning images
+
 const getServiceImage = (serviceId: string): string => {
-  const imageMap: Record<string, string> = {
-    "service2": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80", // Чистење на теписи - Carpet cleaning with steam
-    "service3": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на фотеља - Armchair/sofa cleaning
-    "service4": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на двосед - Two-seater sofa cleaning
-    "service5": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на тросед - Three-seater sofa cleaning
-    "service6": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80", // Чистење на спална + душек - Mattress cleaning
-    "service7": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80", // Чистење на столче - Chair cleaning
-    "service8": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80", // Чистење на канцелариски стол - Office desk cleaning
+  const map: Record<string, string> = {
+    "service2": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80",
+    "service3": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
+    "service4": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
+    "service5": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
+    "service6": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
+    "service7": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
+    "service8": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80",
   };
-  return imageMap[serviceId] || "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80";
+  return map[serviceId] || "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80";
 };
 
-const ServicePicker = () => {
+const Services = () => {
   const navigate = useNavigate();
   const { services, setServices } = useAppContext();
 
-  const updateServiceQuantity = (serviceId: string, increment: boolean) => {
-    const service = allServices.find((s: Service) => s.id === serviceId);
-    if (!service) return;
+  const updateQuantity = (serviceId: string, increment: boolean) => {
+    const svc = allServices.find((s) => s.id === serviceId);
+    if (!svc) return;
+    const existing = services.find((s) => s.id === serviceId);
 
-    const existingService = services.find((s: Service) => s.id === serviceId);
-    
-    if (existingService) {
+    if (existing) {
       if (increment) {
         setServices(
-          services.map((s: Service) =>
-            s.id === serviceId
-              ? { ...s, quantity: (s.quantity || 0) + 1 }
-              : s
+          services.map((s) =>
+            s.id === serviceId ? { ...s, quantity: (s.quantity || 0) + 1 } : s
           )
         );
       } else {
-        if (existingService.quantity && existingService.quantity > 1) {
+        if (existing.quantity && existing.quantity > 1) {
           setServices(
-            services.map((s: Service) =>
-              s.id === serviceId
-                ? { ...s, quantity: (s.quantity || 1) - 1 }
-                : s
+            services.map((s) =>
+              s.id === serviceId ? { ...s, quantity: (s.quantity || 1) - 1 } : s
             )
           );
         } else {
-          setServices(services.filter((s: Service) => s.id !== serviceId));
+          setServices(services.filter((s) => s.id !== serviceId));
         }
       }
     } else if (increment) {
-      setServices([...services, { ...service, quantity: 1 }]);
+      setServices([...services, { ...svc, quantity: 1 }]);
     }
   };
 
-  return (
-    <Container maxWidth="lg" sx={{ width: '100%', py: { xs: 2, sm: 4 } }}>
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        width="100%"
-        sx={{ gap: 4 }}
-      >
-        {/* Header Section */}
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Typography 
-            variant="h3"
-            sx={{
-              fontSize: { xs: '1.75rem', sm: '2.5rem' },
-              fontWeight: 800,
-              color: '#2c3e50',
-              mb: 2,
-            }}
-          >
-            Избери Услуги
-          </Typography>
-          <Typography 
-            variant="body1"
-            sx={{
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              color: '#64748b',
-              maxWidth: '600px',
-              mx: 'auto',
-            }}
-          >
-            Изберете услуги за хемиско чистење и притиснете "Следно" за да продолжите.
-          </Typography>
-        </Box>
-      
-        {/* Services Grid */}
-        <Box 
-          sx={{ 
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-            gap: { xs: 2, sm: 3 },
-            width: '100%',
-          }}
-        >
-          {allServices.map((service: Service) => {
-            const selectedService = services.find((s: Service) => s.id === service.id);
-            const isSelected = selectedService?.quantity && selectedService.quantity > 0;
+  const totalItems = services.reduce((sum, s) => sum + (s.quantity || 1), 0);
+  const totalPrice = services.reduce((sum, s) => sum + s.price * (s.quantity || 1), 0);
 
-            return (
-              <Card 
-                key={service.id} 
-                sx={{ 
-                  padding: { xs: 2, sm: 3 },
-                  borderRadius: '20px',
-                  background: isSelected 
-                    ? '#f8f9fa'
-                    : '#ffffff',
-                  border: isSelected 
-                    ? '2px solid #2c3e50' 
-                    : '1px solid #ecf0f1',
-                  boxShadow: isSelected 
-                    ? '0 8px 32px rgba(44, 62, 80, 0.15)' 
-                    : '0 4px 16px rgba(0, 0, 0, 0.06)',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&::before': isSelected ? {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '4px',
-                    background: '#2c3e50',
-                  } : {},
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)',
-                  },
-                }}
-              >
-                <Box sx={{ mb: 2 }}>
-                  <Box
-                    component="img"
+  return (
+    <div className="flex flex-col min-h-full pt-2 pb-4">
+      {/* Header */}
+      <div className="text-center mb-4">
+        <h1 className="font-display text-2xl sm:text-3xl text-white mb-1">
+          Избери Услуги
+        </h1>
+        <p className="text-sm text-slate-400">
+          Изберете услуги за хемиско чистење
+        </p>
+      </div>
+
+      {/* Grid */}
+      <div className="flex-1 space-y-3 pb-24">
+        {allServices.map((service) => {
+          const selected = services.find((s) => s.id === service.id);
+          const qty = selected?.quantity || 0;
+
+          return (
+            <div
+              key={service.id}
+              className={`rounded-2xl overflow-hidden border transition-all duration-200 ${
+                qty > 0
+                  ? "border-gold-500/50 bg-dark-700 shadow-lg shadow-gold-500/10"
+                  : "border-dark-600/50 bg-dark-800"
+              }`}
+            >
+              <div className="flex gap-3 p-3">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0">
+                  <img
                     src={getServiceImage(service.id)}
                     alt={service.name}
-                    sx={{
-                      width: '100%',
-                      height: { xs: '180px', sm: '200px' },
-                      objectFit: 'cover',
-                      borderRadius: '16px',
-                      mb: 2,
-                    }}
+                    className="w-full h-full object-cover"
                   />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                    <Typography 
-                      variant="h5" 
-                      sx={{ 
-                        fontWeight: 700,
-                        fontSize: { xs: '1.125rem', sm: '1.25rem' },
-                        color: '#1a202c',
-                      }}
-                    >
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold text-white leading-tight truncate">
                       {service.name}
-                    </Typography>
-                    <Chip
-                      label={`${service.price} ден.`}
-                      sx={{
-                        background: '#2c3e50',
-                        color: 'white',
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                      }}
-                    />
-                  </Box>
-                  <Typography 
-                    variant="body2"
-                    sx={{
-                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                      color: '#64748b',
-                      lineHeight: 1.6,
-                      mb: 2,
-                    }}
-                  >
+                    </h3>
+                    <span className="text-xs font-bold text-gold-400 whitespace-nowrap mt-0.5">
+                      {service.price} ден.
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                     {service.description}
-                  </Typography>
-                </Box>
+                  </p>
 
-                {isSelected && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mb: 2,
-                      p: 1.5,
-                      background: '#2c3e50',
-                      borderRadius: '12px',
-                      color: 'white',
-                    }}
-                  >
-                    <Typography sx={{ fontWeight: 700, fontSize: '1.125rem' }}>
-                      Количина: {selectedService.quantity}
-                    </Typography>
-                  </Box>
-                )}
+                  {/* Quantity controls */}
+                  <div className="flex items-center gap-2 mt-2.5">
+                    {qty > 0 ? (
+                      <>
+                        <button
+                          onClick={() => updateQuantity(service.id, false)}
+                          className="w-8 h-8 rounded-lg bg-dark-600 text-slate-400 hover:text-gold-400 flex items-center justify-center transition-colors active:scale-90"
+                        >
+                          <Minus size={14} />
+                        </button>
+                        <span className="text-sm font-semibold text-white w-6 text-center">
+                          {qty}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(service.id, true)}
+                          className="w-8 h-8 rounded-lg bg-dark-600 text-slate-400 hover:text-gold-400 flex items-center justify-center transition-colors active:scale-90"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => updateQuantity(service.id, true)}
+                        className="text-xs font-medium text-gold-400 hover:text-gold-300 transition-colors"
+                      >
+                        + Додади услуга
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-                {!isSelected ? (
-                  <Button
-                    variant="contained"
-                    onClick={() => updateServiceQuantity(service.id, true)} 
-                    fullWidth
-                    startIcon={<AddIcon />}
-                    sx={{
-                      background: '#2c3e50',
-                      borderRadius: '12px',
-                      padding: { xs: '12px', sm: '14px' },
-                      fontSize: { xs: '0.875rem', sm: '1rem' },
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
-                      '&:hover': { 
-                        background: '#34495e',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
-                      },
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
-                  >
-                    Додади услуга
-                  </Button>
-                ) : (
-                  <Box 
-                    display="flex" 
-                    gap={1.5}
-                  >
-                    <Button
-                      variant="outlined"
-                      onClick={() => updateServiceQuantity(service.id, false)} 
-                      fullWidth
-                      startIcon={<RemoveIcon />}
-                      sx={{
-                        borderColor: '#2c3e50',
-                        color: '#2c3e50',
-                        borderRadius: '12px',
-                        padding: { xs: '12px', sm: '14px' },
-                        fontSize: { xs: '0.875rem', sm: '1rem' },
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        '&:hover': { 
-                          backgroundColor: '#f8f9fa',
-                          borderColor: '#34495e',
-                          transform: 'translateY(-2px)',
-                        },
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      Намали
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={() => updateServiceQuantity(service.id, true)} 
-                      fullWidth
-                      startIcon={<AddIcon />}
-                      sx={{
-                        background: '#2c3e50',
-                        borderRadius: '12px',
-                        padding: { xs: '12px', sm: '14px' },
-                        fontSize: { xs: '0.875rem', sm: '1rem' },
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
-                        '&:hover': { 
-                          background: '#34495e',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
-                        },
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      }}
-                    >
-                      Зголеми
-                    </Button>
-                  </Box>
-                )}
-              </Card>
-            );
-          })}
-        </Box>
-
-        {/* Next Button */}
-        <Box 
-          sx={{ 
-            position: 'sticky',
-            bottom: { xs: 16, sm: 24 },
-            zIndex: 10,
-            mt: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={() => navigate('/schedule')}
-            fullWidth
+      {/* Sticky bottom bar */}
+      <div className="fixed bottom-16 left-0 right-0 z-40 px-4 pb-2 max-w-lg mx-auto">
+        <div className="bg-dark-800/95 backdrop-blur-xl border border-dark-600/50 rounded-2xl p-3 shadow-xl">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center gap-2">
+              <ShoppingBag size={16} className="text-gold-400" />
+              <span className="text-sm text-slate-400">
+                {totalItems} {totalItems === 1 ? "услуга" : "услуги"}
+              </span>
+            </div>
+            <span className="text-base font-bold text-gold-400">
+              {totalPrice} ден.
+            </span>
+          </div>
+          <button
+            onClick={() => navigate("/schedule")}
             disabled={services.length === 0}
-            sx={{
-              background: '#2c3e50',
-              borderRadius: '16px',
-              padding: { xs: '16px', sm: '20px' },
-              fontSize: { xs: '1rem', sm: '1.125rem' },
-              fontWeight: 700,
-              textTransform: 'none',
-              letterSpacing: '0.5px',
-              color: 'white',
-              boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
-              '&:hover': { 
-                background: '#34495e',
-                transform: 'translateY(-4px)',
-                boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
-              },
-              '&:disabled': {
-                background: '#e2e8f0',
-                color: '#94a3b8',
-              },
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-400 text-dark-900 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all"
           >
             Продолжи со избор на датум →
-          </Button>
-        </Box>
-      </Box>
-    </Container>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default ServicePicker;
+export default Services;

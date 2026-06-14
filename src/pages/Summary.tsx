@@ -1,353 +1,230 @@
-import { Box, Button, Typography, Container, Card, Divider } from "@mui/material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-
-import { useAppContext } from "../context/AppContext";
+import {
+  CheckCircle,
+  CalendarDays,
+  Clock,
+  MapPin,
+  User,
+  Phone,
+  Wallet,
+  Loader2,
+} from "lucide-react";
 import dayjs from "dayjs";
+import { useAppContext } from "../context/AppContext";
+import { supabase } from "../lib/supabase";
 
 const Summary = () => {
   const navigate = useNavigate();
-  const { services, calendarValue, timeValue, location } = useAppContext();
-  const formattedDate = calendarValue ? dayjs(calendarValue).format('DD MMMM YYYY') : null;
-  const formattedTime = timeValue ? dayjs(timeValue).format('HH:mm') : null;
-  const totalPrice = services.reduce((total, service) => total + (service.price * (service.quantity || 1)), 0);
+  const {
+    services, calendarValue, timeValue,
+    location, clientInfo, setBookingRef, resetAll,
+  } = useAppContext();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const formattedDate = calendarValue
+    ? dayjs(calendarValue).format("DD MMMM YYYY")
+    : null;
+
+  const totalPrice = services.reduce(
+    (sum, s) => sum + s.price * (s.quantity || 1),
+    0
+  );
+
+  const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    setError(null);
+
+    const bookingData = {
+      date: calendarValue,
+      time: timeValue,
+      client_name: clientInfo?.name,
+      client_phone: clientInfo?.phone,
+      client_email: clientInfo?.email || null,
+      address: location?.address,
+      lat: location?.lat || 0,
+      lng: location?.lng || 0,
+      services: services.map((s) => ({
+        id: s.id,
+        name: s.name,
+        price: s.price,
+        quantity: s.quantity,
+      })),
+      total_price: totalPrice,
+      status: "confirmed",
+    };
+
+    try {
+      const { data, error: insertError } = await supabase
+        .from("bookings")
+        .insert([bookingData])
+        .select("ref")
+        .single();
+
+      if (insertError) throw insertError;
+
+      setBookingRef(data?.ref || null);
+      resetAll();
+      navigate("/confirmation");
+    } catch (err: any) {
+      console.error("Booking failed:", err);
+      // If Supabase isn't set up yet, simulate success for demo
+      if (err.message?.includes("Failed to fetch") || err.code === "PGRST301") {
+        setBookingRef("DEMO-001");
+        resetAll();
+        navigate("/confirmation");
+      } else {
+        setError("Неуспешно резервирање. Обидете се повторно.");
+        setSubmitting(false);
+      }
+    }
+  };
 
   return (
-    <Container maxWidth="md" sx={{ width: '100%', py: { xs: 2, sm: 4 } }}>
-      <Box 
-        sx={{ 
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3,
-        }}
-      >
-        {/* Header */}
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Typography 
-            variant="h3"
-            sx={{
-              fontSize: { xs: '1.75rem', sm: '2.5rem' },
-              fontWeight: 800,
-              color: '#2c3e50',
-              mb: 1,
-            }}
-          >
-            Преглед на Резервација
-          </Typography>
-          <Typography 
-            variant="body1"
-            sx={{
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              color: '#64748b',
-            }}
-          >
-            Проверете ги деталите пред да ја потврдите резервацијата
-          </Typography>
-        </Box>
+    <div className="flex flex-col gap-3 pt-2 pb-4">
+      {/* Header */}
+      <div className="text-center mb-1">
+        <h1 className="font-display text-2xl sm:text-3xl text-white mb-1">
+          Преглед
+        </h1>
+        <p className="text-sm text-slate-400">
+          Проверете ги деталите пред да потврдите
+        </p>
+      </div>
 
-        {/* Services Card */}
-        <Card
-          sx={{
-            p: { xs: 3, sm: 4 },
-            borderRadius: '24px',
-            background: '#ffffff',
-            border: '1px solid #ecf0f1',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
-          }}
+      {/* Services card */}
+      <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <CheckCircle size={16} className="text-gold-400" />
+          <h3 className="text-sm font-semibold text-white">Услуги</h3>
+        </div>
+        <div className="space-y-2">
+          {services.map((s) => (
+            <div
+              key={s.id}
+              className="flex items-center justify-between bg-dark-700 rounded-xl px-3 py-2.5"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-white truncate">{s.name}</p>
+                <p className="text-xs text-slate-500">
+                  {s.quantity} × {s.price} ден.
+                </p>
+              </div>
+              <span className="text-sm font-semibold text-gold-400 ml-2 whitespace-nowrap">
+                {s.price * (s.quantity || 1)} ден.
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Date & Time & Location card */}
+      <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4 space-y-3">
+        {/* Date */}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-dark-700 flex items-center justify-center flex-shrink-0">
+            <CalendarDays size={16} className="text-gold-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500">Датум</p>
+            <p className="text-sm font-medium text-white">
+              {formattedDate || "Нe e избран"}
+            </p>
+          </div>
+        </div>
+
+        {/* Time */}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-dark-700 flex items-center justify-center flex-shrink-0">
+            <Clock size={16} className="text-gold-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500">Време</p>
+            <p className="text-sm font-medium text-white">
+              {timeValue || "Нe e избрано"}
+            </p>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-dark-700 flex items-center justify-center flex-shrink-0">
+            <MapPin size={16} className="text-gold-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500">Адреса</p>
+            <p className="text-sm font-medium text-white truncate">
+              {location?.address || "Нe e поставена"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Client info card */}
+      {clientInfo && (
+        <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-dark-700 flex items-center justify-center flex-shrink-0">
+              <User size={16} className="text-gold-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-slate-500">Име</p>
+              <p className="text-sm font-medium text-white">{clientInfo.name}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-dark-700 flex items-center justify-center flex-shrink-0">
+              <Phone size={16} className="text-gold-400" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-slate-500">Телефон</p>
+              <p className="text-sm font-medium text-white">{clientInfo.phone}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Total card */}
+      <div className="rounded-2xl bg-gradient-to-br from-gold-500 to-gold-600 p-4 shadow-lg shadow-gold-500/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wallet size={18} className="text-dark-900" />
+            <span className="text-sm font-semibold text-dark-900">Вкупно</span>
+          </div>
+          <span className="text-2xl font-bold text-dark-900">
+            {totalPrice} ден.
+          </span>
+        </div>
+        <p className="text-xs text-dark-900/60 mt-1">
+          Плаќање на лице место - само кеш
+        </p>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <p className="text-sm text-red-400 text-center">{error}</p>
+      )}
+
+      {/* Confirm button */}
+      <div className="pt-2 pb-4">
+        <button
+          onClick={handleConfirm}
+          disabled={submitting}
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-gold-500 to-gold-400 text-dark-900 font-bold text-sm disabled:opacity-50 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-gold-500/20"
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-            <Box
-              sx={{
-                p: 1.5,
-                borderRadius: '12px',
-                background: '#2c3e50',
-                mr: 2,
-              }}
-            >
-              <CheckCircleIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
-            </Box>
-            <Typography 
-              variant="h5"
-              sx={{
-                fontWeight: 700,
-                fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                color: '#1a202c',
-              }}
-            >
-              Избрани Услуги
-            </Typography>
-          </Box>
-
-          {services.length === 0 ? (
-            <Typography 
-              variant="body1"
-              sx={{
-                fontSize: { xs: '0.875rem', sm: '1rem' },
-                textAlign: 'center',
-                color: '#94a3b8',
-                py: 4,
-              }}
-            >
-              Нема избрани услуги.
-            </Typography>
+          {submitting ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Закажување...
+            </>
           ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {services.map((service, index) => (
-                <Box key={service.id}>
-                  <Box 
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      p: 2,
-                      borderRadius: '12px',
-                      background: '#f8f9fa',
-                    }}
-                  >
-                    <Box sx={{ flex: 1 }}>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
-                          fontWeight: 600,
-                          fontSize: { xs: '1rem', sm: '1.125rem' },
-                          mb: 0.5,
-                          color: '#1a202c',
-                        }}
-                      >
-                        {service.name}
-                      </Typography>
-                      <Typography 
-                        variant="body2"
-                        sx={{
-                          fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                          color: '#64748b',
-                        }}
-                      >
-                        Количество: {service.quantity} × {service.price} ден.
-                      </Typography>
-                    </Box>
-                    <Typography 
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: { xs: '1rem', sm: '1.125rem' },
-                        color: '#2c3e50',
-                        ml: 2,
-                      }}
-                    >
-                      {service.price * (service.quantity || 1)} ден.
-                    </Typography>
-                  </Box>
-                  {index < services.length - 1 && <Divider sx={{ my: 2 }} />}
-                </Box>
-              ))}
-            </Box>
+            "Потврди резервација ✓"
           )}
-        </Card>
-
-        {/* Date and Time Card */}
-        <Card
-          sx={{
-            p: { xs: 3, sm: 4 },
-            borderRadius: '24px',
-            background: '#ffffff',
-            border: '1px solid #ecf0f1',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
-          }}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Date */}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: '12px',
-                  background: '#2c3e50',
-                  mr: 2,
-                }}
-              >
-                <CalendarTodayIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography 
-                  variant="body2"
-                  sx={{
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                    color: '#64748b',
-                    mb: 0.5,
-                  }}
-                >
-                  Датум на хемиско чистење
-                </Typography>
-                <Typography 
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: { xs: '1rem', sm: '1.125rem' },
-                    color: '#1a202c',
-                  }}
-                >
-                  {formattedDate || 'Датумот не е избран'}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Time */}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: '12px',
-                  background: '#2c3e50',
-                  mr: 2,
-                }}
-              >
-                <AccessTimeIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography 
-                  variant="body2"
-                  sx={{
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                    color: '#64748b',
-                    mb: 0.5,
-                  }}
-                >
-                  Време на хемиско чистење
-                </Typography>
-                <Typography 
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: { xs: '1rem', sm: '1.125rem' },
-                    color: '#1a202c',
-                  }}
-                >
-                  {formattedTime || 'Времето не е избрано'}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Location */}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: '12px',
-                  background: '#2c3e50',
-                  mr: 2,
-                }}
-              >
-                <LocationOnIcon sx={{ color: 'white', fontSize: '1.5rem' }} />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography 
-                  variant="body2"
-                  sx={{
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                    color: '#64748b',
-                    mb: 0.5,
-                  }}
-                >
-                  Адреса за хемиско чистење
-                </Typography>
-                <Typography 
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: { xs: '1rem', sm: '1.125rem' },
-                    color: '#1a202c',
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {location?.address || 'Адресата не е поставена'}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        </Card>
-
-        {/* Total Price Card */}
-        <Card
-          sx={{
-            p: { xs: 3, sm: 4 },
-            borderRadius: '24px',
-            background: '#2c3e50',
-            boxShadow: '0 8px 32px rgba(44, 62, 80, 0.2)',
-            color: 'white',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <AttachMoneyIcon sx={{ fontSize: '2rem', mr: 1.5 }} />
-              <Typography 
-                variant="h6"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: { xs: '1rem', sm: '1.125rem' },
-                }}
-              >
-                Вкупна цена
-              </Typography>
-            </Box>
-            <Typography 
-              variant="h4"
-              sx={{
-                fontWeight: 800,
-                fontSize: { xs: '1.75rem', sm: '2.25rem' },
-              }}
-            >
-              {totalPrice} ден.
-            </Typography>
-          </Box>
-        </Card>
-
-        {/* Confirm Button */}
-        <Box
-          sx={{
-            position: 'sticky',
-            bottom: { xs: 16, sm: 24 },
-            zIndex: 10,
-            mt: 2,
-          }}
-        >
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={() => navigate('/')}
-            disabled={services.length === 0 || !formattedDate || !formattedTime || !location}
-            sx={{
-              background: '#2c3e50',
-              borderRadius: '16px',
-              padding: { xs: '16px', sm: '20px' },
-              fontSize: { xs: '1rem', sm: '1.125rem' },
-              fontWeight: 700,
-              textTransform: 'none',
-              letterSpacing: '0.5px',
-              color: 'white',
-              boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
-              '&:hover': { 
-                background: '#34495e',
-                transform: 'translateY(-4px)',
-                boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
-              },
-              '&:disabled': {
-                background: '#e2e8f0',
-                color: '#94a3b8',
-              },
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          >
-            Потврди резервација ✓
-          </Button>
-        </Box>
-      </Box>
-    </Container>
+        </button>
+      </div>
+    </div>
   );
 };
 

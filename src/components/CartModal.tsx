@@ -1,335 +1,147 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  Typography,
-  Button,
-  IconButton,
-  Divider,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
-import type { Service } from "../types";
 
-interface CartModalProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-const CartModal = ({ open, onClose }: CartModalProps) => {
+const CartModal = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const { services, setServices } = useAppContext();
 
-  const updateServiceQuantity = (serviceId: string, increment: boolean) => {
-    const existingService = services.find((s: Service) => s.id === serviceId);
-    
-    if (existingService) {
-      if (increment) {
-        setServices(
-          services.map((s: Service) =>
-            s.id === serviceId
-              ? { ...s, quantity: (s.quantity || 0) + 1 }
-              : s
-          )
-        );
-      } else {
-        if (existingService.quantity && existingService.quantity > 1) {
-          setServices(
-            services.map((s: Service) =>
-              s.id === serviceId
-                ? { ...s, quantity: (s.quantity || 1) - 1 }
-                : s
-            )
-          );
-        } else {
-          setServices(services.filter((s: Service) => s.id !== serviceId));
-        }
-      }
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const updateQuantity = (id: string, delta: number) => {
+    setServices(
+      services
+        .map((s) =>
+          s.id === id ? { ...s, quantity: (s.quantity || 1) + delta } : s
+        )
+        .filter((s) => (s.quantity || 0) > 0)
+    );
   };
 
-  const removeService = (serviceId: string) => {
-    setServices(services.filter((s: Service) => s.id !== serviceId));
+  const removeService = (id: string) => {
+    setServices(services.filter((s) => s.id !== id));
   };
 
   const totalPrice = services.reduce(
-    (total, service) => total + service.price * (service.quantity || 1),
-    0
-  );
-
-  const totalItems = services.reduce(
-    (total, service) => total + (service.quantity || 1),
+    (sum, s) => sum + s.price * (s.quantity || 1),
     0
   );
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: "20px",
-          maxHeight: "90vh",
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          pb: 2,
-          borderBottom: "1px solid #ecf0f1",
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{
-            fontWeight: 700,
-            color: "#2c3e50",
-            fontSize: { xs: "1.25rem", sm: "1.5rem" },
-          }}
-        >
-          Кошничка ({totalItems})
-        </Typography>
-        <IconButton
-          onClick={onClose}
-          sx={{
-            color: "#7f8c8d",
-            "&:hover": {
-              background: "#f8f9fa",
-            },
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-
-      <DialogContent sx={{ p: 0 }}>
-        {services.length === 0 ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              py: 8,
-              px: 3,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                color: "#7f8c8d",
-                mb: 1,
-                fontSize: { xs: "1rem", sm: "1.125rem" },
-              }}
-            >
-              Кошничката е празна
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "#95a5a6",
-                textAlign: "center",
-              }}
-            >
-              Додадете услуги за да продолжите
-            </Typography>
-          </Box>
-        ) : (
-          <Box sx={{ p: { xs: 2, sm: 3 } }}>
-            {services.map((service, index) => (
-              <Box key={service.id}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 2,
-                    py: 2,
-                  }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: { xs: "1rem", sm: "1.125rem" },
-                        color: "#2c3e50",
-                        mb: 0.5,
-                      }}
-                    >
-                      {service.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#7f8c8d",
-                        fontSize: { xs: "0.8125rem", sm: "0.875rem" },
-                        mb: 1.5,
-                      }}
-                    >
-                      {service.price} ден. × {service.quantity || 1}
-                    </Typography>
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => updateServiceQuantity(service.id, false)}
-                        sx={{
-                          border: "1px solid #ecf0f1",
-                          color: "#2c3e50",
-                          width: "32px",
-                          height: "32px",
-                          "&:hover": {
-                            background: "#f8f9fa",
-                            borderColor: "#bdc3c7",
-                          },
-                        }}
-                      >
-                        <RemoveIcon fontSize="small" />
-                      </IconButton>
-
-                      <Typography
-                        sx={{
-                          minWidth: "40px",
-                          textAlign: "center",
-                          fontWeight: 600,
-                          color: "#2c3e50",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        {service.quantity || 1}
-                      </Typography>
-
-                      <IconButton
-                        size="small"
-                        onClick={() => updateServiceQuantity(service.id, true)}
-                        sx={{
-                          border: "1px solid #ecf0f1",
-                          color: "#2c3e50",
-                          width: "32px",
-                          height: "32px",
-                          "&:hover": {
-                            background: "#f8f9fa",
-                            borderColor: "#bdc3c7",
-                          },
-                        }}
-                      >
-                        <AddIcon fontSize="small" />
-                      </IconButton>
-
-                      <IconButton
-                        size="small"
-                        onClick={() => removeService(service.id)}
-                        sx={{
-                          ml: "auto",
-                          color: "#e74c3c",
-                          "&:hover": {
-                            background: "#fee",
-                          },
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </Box>
-
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 700,
-                      color: "#2c3e50",
-                      fontSize: { xs: "1rem", sm: "1.125rem" },
-                      minWidth: "80px",
-                      textAlign: "right",
-                    }}
-                  >
-                    {service.price * (service.quantity || 1)} ден.
-                  </Typography>
-                </Box>
-                {index < services.length - 1 && <Divider />}
-              </Box>
-            ))}
-          </Box>
-        )}
-      </DialogContent>
-
-      {services.length > 0 && (
+    <AnimatePresence>
+      {open && (
         <>
-          <Divider />
-          <DialogActions
-            sx={{
-              p: { xs: 2, sm: 3 },
-              flexDirection: "column",
-              gap: 2,
-            }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 z-[60]"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-[70] max-w-lg mx-auto bg-dark-800 rounded-t-3xl border border-dark-600/50 max-h-[85vh] flex flex-col"
           >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 700,
-                  color: "#2c3e50",
-                  fontSize: { xs: "1.125rem", sm: "1.25rem" },
-                }}
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-dark-500" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pb-3 border-b border-dark-600/50">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={18} className="text-gold-400" />
+                <h2 className="text-lg font-semibold text-white">Кошничка</h2>
+              </div>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-lg bg-dark-600 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
               >
-                Вкупно:
-              </Typography>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 800,
-                  color: "#2c3e50",
-                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
-                }}
-              >
-                {totalPrice} ден.
-              </Typography>
-            </Box>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={onClose}
-              sx={{
-                background: "#2c3e50",
-                borderRadius: "12px",
-                padding: { xs: "14px", sm: "16px" },
-                fontSize: { xs: "1rem", sm: "1.125rem" },
-                fontWeight: 700,
-                textTransform: "none",
-                color: "white",
-                "&:hover": {
-                  background: "#34495e",
-                },
-              }}
-            >
-              Затвори
-            </Button>
-          </DialogActions>
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Items */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+              {services.length === 0 ? (
+                <div className="text-center py-10">
+                  <p className="text-slate-500 text-sm">Нема избрани услуги</p>
+                </div>
+              ) : (
+                services.map((service) => (
+                  <div
+                    key={service.id}
+                    className="flex items-center gap-3 bg-dark-700 rounded-xl p-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">
+                        {service.name}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {service.price} ден × {service.quantity}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => updateQuantity(service.id, -1)}
+                        className="w-7 h-7 rounded-lg bg-dark-600 text-slate-400 hover:text-gold-400 flex items-center justify-center transition-colors"
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <span className="text-sm font-semibold text-white w-6 text-center">
+                        {service.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(service.id, 1)}
+                        className="w-7 h-7 rounded-lg bg-dark-600 text-slate-400 hover:text-gold-400 flex items-center justify-center transition-colors"
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => removeService(service.id)}
+                      className="w-7 h-7 rounded-lg bg-dark-600 text-red-400/70 hover:text-red-400 flex items-center justify-center transition-colors"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Footer */}
+            {services.length > 0 && (
+              <div className="px-5 py-4 border-t border-dark-600/50">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-slate-400">Вкупно:</span>
+                  <span className="text-xl font-bold text-gold-400">
+                    {totalPrice} ден.
+                  </span>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="w-full py-3 rounded-xl bg-gold-500 text-dark-900 font-semibold text-sm hover:bg-gold-400 transition-colors active:scale-[0.98]"
+                >
+                  Затвори
+                </button>
+              </div>
+            )}
+          </motion.div>
         </>
       )}
-    </Dialog>
+    </AnimatePresence>
   );
 };
 
 export default CartModal;
-

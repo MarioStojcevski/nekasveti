@@ -1,369 +1,180 @@
-import { useState, useEffect, useRef } from "react";
-import {
-  Box,
-  TextField,
-  Typography,
-  InputAdornment,
-} from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import SearchIcon from "@mui/icons-material/Search";
-import type { Map, Marker, LeafletMouseEvent } from "leaflet";
+import { useEffect, useRef, useState } from "react";
+import { MapPin, ChevronDown, ChevronUp } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-interface AddressMapProps {
-  location: { lat: number; lng: number; address: string } | null;
-  onLocationChange: (location: { lat: number; lng: number; address: string }) => void;
-}
+type Location = {
+  lat: number;
+  lng: number;
+  address: string;
+};
 
+const defaultCenter: [number, number] = [41.9973, 21.4280];
 
-const AddressMap = ({ location, onLocationChange }: AddressMapProps) => {
-  const [address, setAddress] = useState(location?.address || "");
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapError, setMapError] = useState<string | null>(null);
-  const [isGeocoding, setIsGeocoding] = useState(false);
-  const mapRef = useRef<Map | null>(null);
-  const markerRef = useRef<Marker | null>(null);
+// Fix default marker icon (Leaflet CDN paths don't work in bundlers)
+const iconUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png";
+const iconRetinaUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png";
+const shadowUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
+
+const goldIcon = new L.DivIcon({
+  className: "",
+  html: `<div style="width: 28px; height: 28px; background: #d4a853; border: 3px solid #0a0a12; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 2px 12px rgba(212,168,83,0.4);"><div style="width: 10px; height: 10px; background: #0a0a12; border-radius: 50%; position: absolute; top: 6px; left: 6px;"></div></div>`,
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+});
+
+const AddressMap = ({
+  location,
+  onLocationChange,
+}: {
+  location: Location | null;
+  onLocationChange: (loc: Location | null) => void;
+}) => {
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState(location?.address || "");
+  const [searching, setSearching] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
+  // Invalidate map size when expanding so tiles render correctly
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    if (expanded && mapRef.current) {
+      setTimeout(() => mapRef.current?.invalidateSize(), 200);
+    }
+  }, [expanded]);
 
-    const initializeMap = () => {
-      if (!window.L || !mapContainerRef.current) {
-        setMapError("Мапата се вчитува...");
-        setTimeout(initializeMap, 100);
-        return;
-      }
+  // Initialize map
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current) {
+      const map = L.map(mapContainerRef.current, {
+        center: location ? [location.lat, location.lng] : defaultCenter,
+        zoom: 13,
+        zoomControl: false,
+        attributionControl: false,
+      });
 
-      try {
-        // Set initial center to Skopje, Macedonia
-        const skopjeCenter: [number, number] = [41.9973, 21.4280];
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+      }).addTo(map);
 
-        // Initialize map
-        mapRef.current = window.L.map(mapContainerRef.current).setView(skopjeCenter, 13);
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+      L.control.attribution({ prefix: false }).addTo(map);
 
-        // Add OpenStreetMap tiles
-        window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19,
-        }).addTo(mapRef.current);
+      const marker = L.marker(
+        location ? [location.lat, location.lng] : defaultCenter,
+        { icon: goldIcon, draggable: true }
+      ).addTo(map);
 
-        // Create initial marker
-        markerRef.current = window.L.marker(skopjeCenter, {
-          draggable: true,
-        }).addTo(mapRef.current);
+      marker.on("dragend", () => {
+        const pos = marker.getLatLng();
+        reverseGeocode(pos.lat, pos.lng);
+      });
 
-        // When marker is dragged, update location
-        markerRef.current.on("dragend", () => {
-          if (markerRef.current) {
-            const position = markerRef.current.getLatLng();
-            reverseGeocode(position.lat, position.lng);
-          }
-        });
+      map.on("click", (e: L.LeafletMouseEvent) => {
+        marker.setLatLng(e.latlng);
+        reverseGeocode(e.latlng.lat, e.latlng.lng);
+      });
 
-        // When marker is clicked, use that location
-        markerRef.current.on("click", () => {
-          if (markerRef.current) {
-            const position = markerRef.current.getLatLng();
-            reverseGeocode(position.lat, position.lng);
-          }
-        });
+      mapRef.current = map;
+      markerRef.current = marker;
+    }
 
-        // When map is clicked, move marker
-        mapRef.current.on("click", (e: LeafletMouseEvent) => {
-          if (markerRef.current && e.latlng) {
-            markerRef.current.setLatLng(e.latlng);
-            reverseGeocode(e.latlng.lat, e.latlng.lng);
-          }
-        });
-
-        setMapLoaded(true);
-        setMapError(null);
-      } catch (error) {
-        console.error("Error initializing map:", error);
-        setMapError("Грешка при креирање на мапата.");
-      }
-    };
-
-    initializeMap();
-
-    // Cleanup
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
   }, []);
 
-  // Reverse geocode: convert coordinates to address using Nominatim (OpenStreetMap)
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-        {
-          headers: {
-            "User-Agent": "NekaBleskaApp/1.0",
-          },
-        }
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+        { headers: { "Accept-Language": "mk" } }
       );
-
-      const data = await response.json();
-      if (data && data.display_name) {
-        const address = data.display_name;
-        setAddress(address);
-        onLocationChange({ lat, lng, address });
-      }
-    } catch (error) {
-      console.error("Reverse geocoding error:", error);
+      const data = await res.json();
+      const address = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      setSearchQuery(address);
+      onLocationChange({ lat, lng, address });
+    } catch {
+      setSearchQuery(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+      onLocationChange({ lat, lng, address: `${lat.toFixed(4)}, ${lng.toFixed(4)}` });
     }
   };
 
-  // Geocode: convert address to coordinates using Nominatim
-  const geocodeAddress = async () => {
-    const addressToSearch = address.trim();
-    if (!addressToSearch) {
-      setMapError("Ве молиме внесете адреса.");
-      return;
-    }
-
-    // Wait for map to be loaded if not ready
-    if (!mapRef.current) {
-      setMapError("Мапата се вчитува. Ве молиме почекајте...");
-      return;
-    }
-
-    setIsGeocoding(true);
-    setMapError(null);
-
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    setSearching(true);
     try {
-      const searchAddress = addressToSearch.includes("Skopje") || addressToSearch.includes("Скопје")
-        ? addressToSearch
-        : `${addressToSearch}, Skopje, Macedonia`;
-
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&addressdetails=1`,
-        {
-          headers: {
-            "User-Agent": "NekaBleskaApp/1.0",
-          },
-        }
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(searchQuery)}&limit=1`,
+        { headers: { "Accept-Language": "mk" } }
       );
-
-      const data = await response.json();
-      if (data && data.length > 0) {
-        const result = data[0];
-        const lat = parseFloat(result.lat);
-        const lng = parseFloat(result.lon);
-
-        // Update map center
-        mapRef.current.setView([lat, lng], 15);
-
-        // Update marker position
-        if (markerRef.current) {
-          markerRef.current.setLatLng([lat, lng]);
-        } else if (mapRef.current) {
-          markerRef.current = window.L.marker([lat, lng], {
-            draggable: true,
-          }).addTo(mapRef.current);
-
-          markerRef.current.on("dragend", () => {
-            if (markerRef.current) {
-              const position = markerRef.current.getLatLng();
-              reverseGeocode(position.lat, position.lng);
-            }
-          });
-
-          markerRef.current.on("click", () => {
-            if (markerRef.current) {
-              const position = markerRef.current.getLatLng();
-              reverseGeocode(position.lat, position.lng);
-            }
-          });
-        }
-
-        const foundAddress = result.display_name || searchAddress;
-        
-        // Update location
-        onLocationChange({
-          lat,
-          lng,
-          address: foundAddress,
-        });
-        setAddress(foundAddress);
-        setMapError(null);
-      } else {
-        setMapError("Адресата не е пронајдена. Обидете се повторно.");
+      const data = await res.json();
+      if (data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        const latNum = parseFloat(lat);
+        const lngNum = parseFloat(lon);
+        mapRef.current?.setView([latNum, lngNum], 15);
+        markerRef.current?.setLatLng([latNum, lngNum]);
+        setSearchQuery(display_name);
+        onLocationChange({ lat: latNum, lng: lngNum, address: display_name });
       }
-    } catch (error) {
-      console.error("Geocoding error:", error);
-      setMapError("Грешка при пребарување на адресата. Обидете се повторно.");
-    } finally {
-      setIsGeocoding(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      geocodeAddress();
-    }
+    } catch {}
+    setSearching(false);
   };
 
   return (
-    <Box
-      sx={{
-        flex: { xs: "1", md: "1" },
-        display: "flex",
-        flexDirection: "column",
-        gap: { xs: 1.5, sm: 2 },
-      }}
-    >
-      <Box sx={{ display: "flex", alignItems: "center", mb: { xs: 0.5, sm: 1 } }}>
-        <Box
-          sx={{
-            p: 0.75,
-            borderRadius: "10px",
-            background: "#2c3e50",
-            mr: 1.5,
-          }}
+    <div className="rounded-2xl bg-dark-800 border border-dark-600/50 overflow-hidden">
+      {/* Search bar */}
+      <div className="flex items-center gap-2 p-3">
+        <div className="flex-1 flex items-center gap-2 bg-dark-700 rounded-xl px-3 py-2.5">
+          <MapPin size={15} className="text-slate-500 flex-shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            placeholder="Внеси адреса..."
+            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
+          />
+        </div>
+        <button
+          onClick={handleSearch}
+          disabled={searching}
+          className="px-4 py-2.5 rounded-xl bg-gold-500 text-dark-900 text-xs font-semibold hover:bg-gold-400 disabled:opacity-50 transition-all active:scale-95"
         >
-          <LocationOnIcon sx={{ color: "white", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
-        </Box>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            fontSize: { xs: "0.9375rem", sm: "1rem" },
-            color: "#1a202c",
-          }}
-        >
-          Адреса
-        </Typography>
-      </Box>
+          {searching ? "..." : "Барај"}
+        </button>
+      </div>
 
-      <TextField
-        fullWidth
-        placeholder="Внесете ја вашата адреса..."
-        value={address}
-        onChange={(e) => {
-          setAddress(e.target.value);
-          setMapError(null);
-        }}
-        onKeyPress={handleKeyPress}
-        disabled={isGeocoding}
-        error={!!mapError}
-        helperText={mapError || (isGeocoding ? "Пребарување..." : "")}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon sx={{ color: isGeocoding ? "#bdc3c7" : "#7f8c8d" }} />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment position="end">
-              <Box
-                onClick={geocodeAddress}
-                sx={{
-                  cursor: isGeocoding ? "wait" : "pointer",
-                  p: 0.5,
-                  borderRadius: "8px",
-                  "&:hover": { 
-                    background: isGeocoding ? "transparent" : "#f8f9fa",
-                  },
-                  opacity: isGeocoding ? 0.6 : 1,
-                }}
-              >
-                <LocationOnIcon sx={{ color: "#2c3e50", fontSize: "1.25rem" }} />
-              </Box>
-            </InputAdornment>
-          ),
-        }}
-        sx={{
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "12px",
-            "&:hover": {
-              "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#2c3e50",
-              },
-            },
-            "&.Mui-focused": {
-              "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#2c3e50",
-                borderWidth: "2px",
-              },
-            },
-          },
-        }}
+      {/* Toggle expand on mobile */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center justify-between w-full px-3 pb-2 text-xs text-slate-500"
+      >
+        <span>{expanded ? "Скриј ја картата" : "Покажи ја картата"}</span>
+        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+
+      {/* Map */}
+      <div
+        ref={mapContainerRef}
+        className={`transition-all duration-300 ${
+          expanded ? "h-48 sm:h-64" : "h-0"
+        }`}
       />
 
-      <Box
-        sx={{
-          width: "100%",
-          height: { xs: "200px", sm: "250px", lg: "350px" },
-          borderRadius: "16px",
-          overflow: "hidden",
-          border: "1px solid #ecf0f1",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-          position: "relative",
-        }}
-      >
-        <Box
-          ref={mapContainerRef}
-          sx={{
-            width: "100%",
-            height: "100%",
-            "& .leaflet-container": {
-              height: "100%",
-              width: "100%",
-              borderRadius: "16px",
-            },
-          }}
-        />
-        {!mapLoaded && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#f8f9fa",
-              zIndex: 1000,
-              p: 2,
-            }}
-          >
-            {mapError ? (
-              <>
-                <Typography sx={{ color: "#e74c3c", mb: 1, textAlign: "center", fontSize: "0.875rem" }}>
-                  {mapError}
-                </Typography>
-              </>
-            ) : (
-              <Typography sx={{ color: "#7f8c8d" }}>
-                Вчитување на мапа...
-              </Typography>
-            )}
-          </Box>
-        )}
-      </Box>
-
+      {/* Selected address */}
       {location && (
-        <Typography
-          variant="body2"
-          sx={{
-            color: "#27ae60",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            textAlign: "center",
-          }}
-        >
-          ✓ Адресата е поставена
-        </Typography>
+        <div className="px-3 pb-3 pt-1">
+          <p className="text-xs text-slate-500 truncate">{location.address}</p>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

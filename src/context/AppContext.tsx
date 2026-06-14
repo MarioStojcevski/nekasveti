@@ -1,6 +1,5 @@
 import { createContext, useContext } from "react";
-import type { Service } from "../types";
-import type { PickerValue } from "@mui/x-date-pickers/internals";
+import type { Service, ClientInfo } from "../types";
 
 type Location = {
   lat: number;
@@ -10,13 +9,18 @@ type Location = {
 
 type AppContextType = {
   services: Service[];
-  setServices: (services: Service[]) => void,
-  calendarValue: PickerValue | null;
-  setCalendarValue: (value: PickerValue | null) => void;
-  timeValue: PickerValue | null;
-  setTimeValue: (value: PickerValue | null) => void;
+  setServices: (services: Service[]) => void;
+  calendarValue: string | null;
+  setCalendarValue: (value: string | null) => void;
+  timeValue: string | null;
+  setTimeValue: (value: string | null) => void;
   location: Location | null;
   setLocation: (value: Location | null) => void;
+  clientInfo: ClientInfo | null;
+  setClientInfo: (value: ClientInfo | null) => void;
+  bookingRef: string | null;
+  setBookingRef: (value: string | null) => void;
+  resetAll: () => void;
 };
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

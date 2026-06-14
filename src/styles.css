@@ -1,34 +1,33 @@
-* {
-  box-sizing: border-box;
-}
+@import "tailwindcss";
+@import "react-day-picker/style.css";
 
-:root {
-  --primary-color: #2c3e50;
-  --primary-light: #34495e;
-  --accent-color: #3498db;
-  --accent-light: #5dade2;
-  --success-color: #27ae60;
-  --text-primary: #2c3e50;
-  --text-secondary: #7f8c8d;
-  --border-color: #ecf0f1;
-  --bg-white: #ffffff;
-  --bg-light: #f8f9fa;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+@theme {
+  --color-dark-900: #0a0a12;
+  --color-dark-800: #0f0f1a;
+  --color-dark-700: #14141f;
+  --color-dark-600: #1c1c2e;
+  --color-dark-500: #252538;
+  --color-gold-400: #d4a853;
+  --color-gold-500: #c49a3f;
+  --color-gold-600: #b0882e;
+  --color-gold-300: #e0c078;
+  --color-gold-200: #ebd49e;
+  --color-slate-300: #8888a0;
+  --color-slate-400: #6b6b85;
+  --color-slate-500: #555570;
+  --color-slate-600: #3d3d52;
+  --font-display: "DM Serif Display", serif;
+  --font-body: "Inter", sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background: var(--color-dark-900);
+  color: #e8e8f0;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #ffffff;
-  min-height: 100vh;
 }
 
 #root {
@@ -36,11 +35,12 @@ body {
   min-height: 100vh;
 }
 
-html {
-  scroll-behavior: smooth;
+button {
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
 }
 
-button, a {
+a {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -50,26 +50,129 @@ img {
   display: block;
 }
 
-/* Hide scrollbar but keep scrolling functionality */
-::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+input, select, textarea {
+  font-family: var(--font-body);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Leaflet dark tile overrides */
+.leaflet-container {
+  background: #0f0f1a !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: transparent;
+.leaflet-control-zoom a {
+  background: #1c1c2e !important;
+  color: #e8e8f0 !important;
+  border-color: #252538 !important;
 }
 
-/* Firefox */
-* {
-  scrollbar-width: none;
+.leaflet-control-attribution {
+  background: rgba(15, 15, 26, 0.8) !important;
+  color: #8888a0 !important;
 }
 
-/* IE and Edge */
-* {
-  -ms-overflow-style: none;
+.leaflet-control-attribution a {
+  color: #d4a853 !important;
 }
+
+/* react-day-picker v10 custom theme */
+.rdp-root {
+  --rdp-accent-color: #d4a853;
+  --rdp-accent-background-color: rgba(212, 168, 83, 0.15);
+  --rdp-day-height: 42px;
+  --rdp-day-width: 42px;
+  --rdp-day_button-border-radius: 10px;
+  --rdp-day_button-border: none;
+  --rdp-day_button-height: 36px;
+  --rdp-day_button-width: 36px;
+  --rdp-today-color: #d4a853;
+  --rdp-disabled-opacity: 0.3;
+  --rdp-outside-opacity: 0.4;
+  --rdp-nav_button-height: 2rem;
+  --rdp-nav_button-width: 2rem;
+  --rdp-nav-height: 2.5rem;
+  margin: 0 auto;
+}
+
+.rdp-months {
+  justify-content: center;
+}
+
+.rdp-caption_label {
+  color: #e8e8f0;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.rdp-button_previous,
+.rdp-button_next {
+  color: #d4a853;
+}
+
+.rdp-chevron {
+  fill: #d4a853;
+}
+
+.rdp-day {
+  color: #c0c0d0;
+  font-weight: 500;
+}
+
+.rdp-day_button {
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+}
+
+.rdp-day_button:hover {
+  background: #1c1c2e !important;
+  color: #d4a853 !important;
+}
+
+.rdp-today .rdp-day_button {
+  font-weight: 700;
+  color: #d4a853;
+}
+
+.rdp-selected .rdp-day_button {
+  background: #d4a853 !important;
+  color: #0a0a12 !important;
+  font-weight: 700;
+  border: none;
+}
+
+.rdp-disabled .rdp-day_button {
+  color: #3d3d52;
+  cursor: not-allowed;
+}
+
+.rdp-weekday {
+  color: #8888a0;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.25rem 0;
+  text-transform: none;
+}
+
+/* Custom anims */
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes draw-check {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 168, 83, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(212, 168, 83, 0.4); }
+}
+
+/* Scrollbar hidden */
+::-webkit-scrollbar { width: 0; background: transparent; }
+* { scrollbar-width: none; -ms-overflow-style: none; }

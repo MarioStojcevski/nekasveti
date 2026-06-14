@@ -1,177 +1,71 @@
-import { Box, Button, Typography, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Sparkles, Zap, ShieldCheck, Target } from "lucide-react";
+
+const features = [
+  { icon: Zap, text: "Брзо и ефикасно", desc: "Закажи за 2 минути" },
+  { icon: ShieldCheck, text: "Професионално", desc: "Сертифицирани експерти" },
+  { icon: Target, text: "Гарантирано", desc: "Резултати или враќање на пари" },
+];
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <Container maxWidth="lg" sx={{ width: '100%', py: { xs: 2, sm: 4 } }}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        width="100%"
-        sx={{
-          minHeight: { xs: 'calc(100vh - 150px)', sm: 'calc(100vh - 200px)' },
-          gap: { xs: 4, sm: 6 },
-        }}
-      >
-        {/* Hero Text Section */}
-        <Box
-          sx={{
-            textAlign: 'center',
-            maxWidth: '800px',
-            px: { xs: 2, sm: 3 },
-            animation: 'fadeInUp 0.8s ease-out',
-          }}
-        >
-          <Typography 
-            variant="h2"
-            sx={{
-              fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
-              fontWeight: 800,
-              color: '#2c3e50',
-              mb: 3,
-              lineHeight: 1.2,
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Професионално Хемиско Чистење
-          </Typography>
-          
-          <Typography 
-            variant="h5"
-            sx={{
-              fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
-              fontWeight: 400,
-              color: '#7f8c8d',
-              lineHeight: 1.7,
-              mb: 4,
-            }}
-          >
-            Закажи хемиско чистење за твојот дом, канцеларија или автомобил за 2 минути. 
-            Нашите експерти ќе го направат тоа со задоволство.
-          </Typography>
-        </Box>
+    <div className="flex flex-col items-center justify-between min-h-[calc(100vh-4rem)] pt-6 sm:pt-12">
+      {/* Top section */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 w-full">
+        {/* Sparkle decorative */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-gold-500/20 blur-3xl rounded-full w-24 h-24 -top-6 -left-6 animate-pulse" />
+          <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-xl shadow-gold-500/20">
+            <Sparkles size={30} className="text-dark-900" />
+          </div>
+        </div>
 
-        {/* Image Section */}
-        <Box
-          sx={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: { xs: '300px', sm: '500px', md: '600px' },
-            mb: 2,
-          }}
-        >
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '-20px',
-              left: '-20px',
-              right: '20px',
-              bottom: '20px',
-              background: '#f8f9fa',
-              borderRadius: '24px',
-              zIndex: 0,
-            }}
-          />
-          <Box
-            component="img"
-            src="https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=800&q=80"
-            alt="Professional Chemical Cleaning Service"
-            sx={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '24px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              objectFit: 'cover',
-              position: 'relative',
-              zIndex: 1,
-              transition: 'transform 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-8px)',
-              },
-            }}
-          />
-        </Box>
+        {/* Title */}
+        <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-white text-center leading-tight mb-3">
+          нека блеска
+        </h1>
 
-        {/* CTA Button */}
-        <Box
-          sx={{
-            width: '100%',
-            maxWidth: { xs: '100%', sm: '400px' },
-            px: { xs: 2, sm: 0 },
-          }}
-        >
-          <Button
-            onClick={() => navigate('/services')}
-            variant="contained"
-            fullWidth
-            sx={{
-              padding: { xs: '16px 32px', sm: '20px 40px' },
-              background: '#2c3e50',
-              borderRadius: '16px',
-              fontSize: { xs: '1rem', sm: '1.125rem' },
-              fontWeight: 700,
-              textTransform: 'none',
-              letterSpacing: '0.5px',
-              color: 'white',
-              boxShadow: '0 4px 16px rgba(44, 62, 80, 0.2)',
-              '&:hover': { 
-                background: '#34495e',
-                transform: 'translateY(-4px)',
-                boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
-              },
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          >
-            Започни сега →
-          </Button>
-        </Box>
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg text-slate-400 text-center max-w-xs leading-relaxed mb-8">
+          Професионално хемиско чистење.
+          <br />
+          Закажи за 2 минути.
+        </p>
 
-        {/* Features */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-            gap: { xs: 2, sm: 3 },
-            width: '100%',
-            maxWidth: '900px',
-            mt: { xs: 2, sm: 4 },
-            px: { xs: 2, sm: 0 },
-          }}
+        {/* CTA */}
+        <button
+          onClick={() => navigate("/services")}
+          className="w-full max-w-xs py-4 px-8 rounded-2xl bg-gradient-to-r from-gold-500 to-gold-400 text-dark-900 font-bold text-base shadow-lg shadow-gold-500/25 hover:shadow-xl hover:shadow-gold-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
         >
-          {[
-            { icon: '⚡', text: 'Брзо и ефикасно' },
-            { icon: '✨', text: 'Професионално' },
-            { icon: '🎯', text: 'Резултати гарантирани' },
-          ].map((feature, index) => (
-            <Box
-              key={index}
-              sx={{
-                textAlign: 'center',
-                p: 2,
-                background: '#f8f9fa',
-                borderRadius: '16px',
-                border: '1px solid #ecf0f1',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
-                  borderColor: '#bdc3c7',
-                },
-              }}
-            >
-              <Typography sx={{ fontSize: '2rem', mb: 1 }}>{feature.icon}</Typography>
-              <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: '#2c3e50' }}>
-                {feature.text}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-    </Container>
+          Започни сега →
+        </button>
+      </div>
+
+      {/* Bottom features */}
+      <div className="w-full max-w-sm px-4 pb-6 sm:pb-10 mt-8">
+        <div className="grid grid-cols-3 gap-3">
+          {features.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div
+                key={f.text}
+                className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-dark-800 border border-dark-600/50"
+              >
+                <div className="w-9 h-9 rounded-xl bg-dark-700 flex items-center justify-center">
+                  <Icon size={16} className="text-gold-400" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-white">{f.text}</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">{f.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 };
 

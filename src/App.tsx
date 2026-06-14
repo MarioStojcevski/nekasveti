@@ -1,39 +1,29 @@
-import { Box } from "@mui/material";
+import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from "./components/Header";
-import { Outlet } from "react-router-dom";
+import BottomNav from "./components/BottomNav";
+import CartModal from "./components/CartModal";
 
 const App = () => {
+  const [cartOpen, setCartOpen] = useState(false);
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
+  const isConfirmation = pathname === "/confirmation";
+  const showBottomNav = !isHome && !isConfirmation;
+
   return (
-    <Box 
-      sx={{ 
-        minHeight: "100vh", 
-        display: "flex", 
-        flexDirection: "column",
-        background: '#ffffff',
-        position: 'relative',
-      }}
-    >
-      <Header />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "flex-start",
-          padding: { xs: 1.5, sm: 3, md: 4 },
-          marginTop: { xs: "70px", sm: "80px" },
-          minHeight: { xs: "calc(100vh - 70px)", sm: "calc(100vh - 80px)" },
-          width: "100%",
-          maxWidth: "1400px",
-          marginX: "auto",
-          pb: { xs: 3, sm: 5 },
-          position: 'relative',
-          zIndex: 1,
-        }}
+    <div className="min-h-screen bg-dark-900 flex flex-col">
+      <Header onCartOpen={() => setCartOpen(true)} />
+      <main
+        className={`flex-1 w-full max-w-lg mx-auto px-4 ${
+          isHome ? "pt-0" : "pt-14 sm:pt-16"
+        } ${showBottomNav ? "pb-20" : "pb-6"}`}
       >
         <Outlet />
-      </Box>
-    </Box>
+      </main>
+      <BottomNav />
+      <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
+    </div>
   );
 };
 

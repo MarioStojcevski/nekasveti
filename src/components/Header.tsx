@@ -1,145 +1,63 @@
-import { useState } from "react";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useLocation, useNavigate } from "react-router-dom";
-import SparklesIcon from '@mui/icons-material/AutoAwesome';
-import { AppBar, Box, IconButton, Toolbar, Typography, Badge } from "@mui/material";
-
-import headerTitles from "../utils/headerTitles";
+import { ArrowLeft, ShoppingCart, Sparkles } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
-import CartModal from "./CartModal";
+import headerTitles from "../utils/headerTitles";
 
-const Header = () => {
+const Header = ({ onCartOpen }: { onCartOpen: () => void }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { services } = useAppContext();
-  const [cartOpen, setCartOpen] = useState(false);
 
   const totalItems = services.reduce(
     (total, service) => total + (service.quantity || 1),
     0
   );
 
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar 
-        position="fixed" 
-        elevation={0}
-        sx={{ 
-          background: '#ffffff',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid #ecf0f1',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-        }}
-      >
-        <Toolbar 
-          sx={{ 
-            minHeight: { xs: '70px', sm: '80px' },
-            px: { xs: 2, sm: 3 },
-            maxWidth: '1400px',
-            mx: 'auto',
-            width: '100%',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              mr: 2,
-            }}
-          >
-            <Box
-              sx={{
-                background: '#f8f9fa',
-                borderRadius: '12px',
-                p: 0.75,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <SparklesIcon sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' }, color: '#2c3e50' }} />
-            </Box>
-            {pathname !== '/' && (
-              <IconButton 
-                size="medium" 
-                color="inherit" 
-                aria-label="back" 
-                onClick={() => navigate(-1)}
-                sx={{ 
-                  background: '#f8f9fa',
-                  color: '#2c3e50',
-                  '&:hover': { 
-                    background: '#ecf0f1',
-                    transform: 'scale(1.05)',
-                  },
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <ArrowBackIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
-              </IconButton>
-            )}
-          </Box>
-          
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              flexGrow: 1,
-              fontSize: { xs: '1rem', sm: '1.25rem' },
-              fontWeight: 700,
-              color: '#2c3e50',
-              letterSpacing: '0.5px',
-            }}
-          >
-            {headerTitles[pathname.replace(/\/$/, '')] || 'нека блеска'}
-          </Typography>
-          
-          <Typography 
-            variant="body2"
-            sx={{ 
-              fontSize: { xs: '0.75rem', sm: '0.875rem' },
-              fontWeight: 500,
-              color: '#7f8c8d',
-              display: { xs: 'none', md: 'block' },
-              letterSpacing: '1px',
-              mr: 2,
-            }}
-          >
-            нека блеска
-          </Typography>
+  const isHome = pathname === "/";
 
-          <Badge
-            badgeContent={totalItems}
-            color="error"
-            sx={{
-              '& .MuiBadge-badge': {
-                background: '#e74c3c',
-                color: 'white',
-                fontWeight: 700,
-                fontSize: '0.75rem',
-              },
-            }}
-          >
-            <IconButton
-              onClick={() => setCartOpen(true)}
-              sx={{
-                background: '#f8f9fa',
-                color: '#2c3e50',
-                '&:hover': {
-                  background: '#ecf0f1',
-                  transform: 'scale(1.05)',
-                },
-                transition: 'all 0.3s ease',
-              }}
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="absolute inset-0 bg-dark-900/80 backdrop-blur-xl border-b border-dark-600/50" />
+      <div className="relative flex items-center justify-between h-14 sm:h-16 px-4 max-w-5xl mx-auto">
+        <div className="flex items-center gap-2">
+          {!isHome && (
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-dark-700 text-slate-300 hover:bg-dark-600 hover:text-gold-400 transition-all active:scale-95"
+              aria-label="Back"
             >
-              <ShoppingCartIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
-            </IconButton>
-          </Badge>
-        </Toolbar>
-      </AppBar>
-      <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
-    </Box>
+              <ArrowLeft size={18} />
+            </button>
+          )}
+          <div className="flex items-center gap-1.5">
+            <Sparkles size={isHome ? 22 : 18} className="text-gold-400" />
+            <span className="font-display text-base sm:text-lg text-white font-semibold tracking-wide">
+              нека блеска
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {!isHome && (
+            <span className="text-sm text-slate-400 font-medium hidden sm:block">
+              {headerTitles[pathname.replace(/\/$/, '')]}
+            </span>
+          )}
+          <button
+            onClick={onCartOpen}
+            className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-dark-700 text-slate-300 hover:bg-dark-600 hover:text-gold-400 transition-all active:scale-95"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={18} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gold-500 text-dark-900 text-[10px] font-bold flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+    </header>
   );
 };
 
