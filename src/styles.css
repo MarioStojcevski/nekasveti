@@ -2,29 +2,32 @@
 @import "react-day-picker/style.css";
 
 @theme {
-  --color-dark-900: #0a0a12;
-  --color-dark-800: #0f0f1a;
-  --color-dark-700: #14141f;
-  --color-dark-600: #1c1c2e;
-  --color-dark-500: #252538;
-  --color-gold-400: #d4a853;
-  --color-gold-500: #c49a3f;
-  --color-gold-600: #b0882e;
-  --color-gold-300: #e0c078;
-  --color-gold-200: #ebd49e;
-  --color-slate-300: #8888a0;
-  --color-slate-400: #6b6b85;
-  --color-slate-500: #555570;
-  --color-slate-600: #3d3d52;
-  --font-display: "DM Serif Display", serif;
-  --font-body: "Inter", sans-serif;
+  --color-page-900: #f5f3f0;
+  --color-page-800: #ffffff;
+  --color-page-700: #eeebe7;
+  --color-page-600: #e3dfda;
+  --color-page-500: #d4cfc8;
+
+  --color-copper-400: #e8854a;
+  --color-copper-500: #d4733a;
+  --color-copper-600: #c0652e;
+  --color-copper-300: #f0a070;
+  --color-copper-200: #f5bf9e;
+
+  --color-text-100: #1a1a1a;
+  --color-text-200: #2d2d2d;
+  --color-text-300: #4a4a4a;
+  --color-text-400: #6b6b6b;
+  --color-text-500: #8c8c8c;
+
+  --font-body: "Poppins", sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background: var(--color-dark-900);
-  color: #e8e8f0;
+  background: var(--color-page-900);
+  color: var(--color-text-100);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -54,37 +57,37 @@ input, select, textarea {
   font-family: var(--font-body);
 }
 
-/* Leaflet dark tile overrides */
+/* Leaflet light tile overrides */
 .leaflet-container {
-  background: #0f0f1a !important;
+  background: var(--color-page-800) !important;
 }
 
 .leaflet-control-zoom a {
-  background: #1c1c2e !important;
-  color: #e8e8f0 !important;
-  border-color: #252538 !important;
+  background: var(--color-page-700) !important;
+  color: var(--color-text-100) !important;
+  border-color: var(--color-page-500) !important;
 }
 
 .leaflet-control-attribution {
-  background: rgba(15, 15, 26, 0.8) !important;
-  color: #8888a0 !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: var(--color-text-400) !important;
 }
 
 .leaflet-control-attribution a {
-  color: #d4a853 !important;
+  color: var(--color-copper-400) !important;
 }
 
 /* react-day-picker v10 custom theme */
 .rdp-root {
-  --rdp-accent-color: #d4a853;
-  --rdp-accent-background-color: rgba(212, 168, 83, 0.15);
+  --rdp-accent-color: #e8854a;
+  --rdp-accent-background-color: rgba(232, 133, 74, 0.15);
   --rdp-day-height: 42px;
   --rdp-day-width: 42px;
   --rdp-day_button-border-radius: 10px;
   --rdp-day_button-border: none;
   --rdp-day_button-height: 36px;
   --rdp-day_button-width: 36px;
-  --rdp-today-color: #d4a853;
+  --rdp-today-color: #e8854a;
   --rdp-disabled-opacity: 0.3;
   --rdp-outside-opacity: 0.4;
   --rdp-nav_button-height: 2rem;
@@ -98,61 +101,62 @@ input, select, textarea {
 }
 
 .rdp-caption_label {
-  color: #e8e8f0;
+  color: var(--color-text-100);
   font-weight: 600;
   font-size: 0.9rem;
 }
 
 .rdp-button_previous,
 .rdp-button_next {
-  color: #d4a853;
+  color: var(--color-copper-400);
 }
 
 .rdp-chevron {
-  fill: #d4a853;
+  fill: var(--color-copper-400);
 }
 
 .rdp-day {
-  color: #c0c0d0;
+  color: var(--color-text-200);
   font-weight: 500;
 }
 
 .rdp-day_button {
   font-size: 0.85rem;
   transition: all 0.15s ease;
+  font-family: var(--font-body);
 }
 
 .rdp-day_button:hover {
-  background: #1c1c2e !important;
-  color: #d4a853 !important;
+  background: var(--color-page-600) !important;
+  color: var(--color-copper-400) !important;
 }
 
 .rdp-today .rdp-day_button {
   font-weight: 700;
-  color: #d4a853;
+  color: var(--color-copper-400);
 }
 
 .rdp-selected .rdp-day_button {
-  background: #d4a853 !important;
-  color: #0a0a12 !important;
+  background: var(--color-copper-400) !important;
+  color: #ffffff !important;
   font-weight: 700;
   border: none;
 }
 
 .rdp-disabled .rdp-day_button {
-  color: #3d3d52;
+  color: var(--color-text-500);
   cursor: not-allowed;
 }
 
 .rdp-weekday {
-  color: #8888a0;
+  color: var(--color-text-400);
   font-weight: 600;
   font-size: 0.7rem;
   padding: 0.25rem 0;
   text-transform: none;
 }
 
-/* Custom anims */
+/* Custom animations */
 @keyframes sparkle {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.7; transform: scale(1.1); }
@@ -169,8 +173,8 @@ input, select, textarea {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(212, 168, 83, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(212, 168, 83, 0.4); }
+  0%, 100% { box-shadow: 0 0 20px rgba(232, 133, 74, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(232, 133, 74, 0.4); }
 }
 
 /* Scrollbar hidden */

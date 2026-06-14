@@ -9,15 +9,16 @@ const App = () => {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
   const isConfirmation = pathname === "/confirmation";
-  const showBottomNav = !isHome && !isConfirmation;
+  const isAdmin = pathname.startsWith("/admin");
+  const showBottomNav = !isHome && !isConfirmation && !isAdmin;
 
   return (
-    <div className="min-h-screen bg-dark-900 flex flex-col">
+    <div className="min-h-screen bg-page-900 flex flex-col">
       <Header onCartOpen={() => setCartOpen(true)} />
       <main
         className={`flex-1 w-full max-w-lg mx-auto px-4 ${
           isHome ? "pt-0" : "pt-14 sm:pt-16"
-        } ${showBottomNav ? "pb-20" : "pb-6"}`}
+        } ${showBottomNav ? "pb-20" : "pb-6"} ${isAdmin ? "max-w-4xl" : ""}`}
       >
         <Outlet />
       </main>

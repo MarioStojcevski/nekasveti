@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { DayPicker } from "react-day-picker";
 import dayjs from "dayjs";
@@ -15,10 +15,10 @@ const Schedule = () => {
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const [month, setMonth] = useState<Date>(new Date());
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const selectedDate = calendarValue ? dayjs(calendarValue).toDate() : undefined;
 
-  // Fetch all booked dates for the current month
   useEffect(() => {
     const firstDay = dayjs(month).startOf("month").format("YYYY-MM-DD");
     const lastDay = dayjs(month).endOf("month").format("YYYY-MM-DD");
@@ -36,7 +36,6 @@ const Schedule = () => {
       });
   }, [month]);
 
-  // Fetch booked time slots for the selected date
   useEffect(() => {
     if (calendarValue) {
       supabase
@@ -54,7 +53,6 @@ const Schedule = () => {
     setCalendarValue(date ? dayjs(date).format("YYYY-MM-DD") : null);
   };
 
-  // Disable days more than 60 days out
   const maxDate = dayjs().add(60, "day").toDate();
 
   const allDisabled = (date: Date) => {
@@ -64,50 +62,47 @@ const Schedule = () => {
   };
 
   return (
-    <div className="flex flex-col gap-3 pt-2 pb-4">
-      {/* Header */}
-      <div className="text-center mb-1">
-        <h1 className="font-display text-2xl sm:text-3xl text-white mb-1">
-          Избери Термин
-        </h1>
-        <p className="text-sm text-slate-400">
-          Изберете датум, време и адреса
-        </p>
-      </div>
+    <div className="flex flex-col h-full pt-2">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto pb-28 space-y-3 px-0">
+        <div className="text-center mb-1">
+          <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
+            Избери Термин
+          </h1>
+          <p className="text-sm text-text-400">
+            Изберете датум, време и адреса
+          </p>
+        </div>
 
-      {/* Calendar */}
-      <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-3 flex justify-center">
-        <DayPicker
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleDateSelect}
-          month={month}
-          onMonthChange={setMonth}
-          disabled={allDisabled}
-          showOutsideDays={false}
-          modifiers={{ hasBooking: bookedDates }}
-          modifiersStyles={{
-            hasBooking: { textDecoration: "underline", textDecorationColor: "#d4a853", textUnderlineOffset: "4px", textDecorationThickness: "2px" },
-          }}
+        <div className="rounded-2xl bg-page-800 border border-page-500/50 p-3 flex justify-center">
+          <DayPicker
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+            month={month}
+            onMonthChange={setMonth}
+            disabled={allDisabled}
+            showOutsideDays={false}
+            modifiers={{ hasBooking: bookedDates }}
+            modifiersStyles={{
+              hasBooking: { textDecoration: "underline", textDecorationColor: "#e8854a", textUnderlineOffset: "4px", textDecorationThickness: "2px" },
+            }}
+          />
+        </div>
+
+        <TimeSlotGrid
+          selectedTime={timeValue}
+          onSelect={setTimeValue}
+          bookedSlots={bookedSlots}
         />
+
+        <AddressMap location={location} onLocationChange={setLocation} />
       </div>
 
-      {/* Time Slot Grid */}
-      <TimeSlotGrid
-        selectedTime={timeValue}
-        onSelect={setTimeValue}
-        bookedSlots={bookedSlots}
-      />
-
-      {/* Address Map */}
-      <AddressMap location={location} onLocationChange={setLocation} />
-
-      {/* Next Button */}
-      <div className="sticky bottom-20 z-30 pt-2 pb-4">
+      <div className="fixed bottom-16 left-0 right-0 z-40 px-4 pb-3 max-w-lg mx-auto">
         <button
           onClick={() => navigate("/client-info")}
           disabled={!calendarValue || !timeValue || !location}
-          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 to-gold-400 text-dark-900 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           Продолжи кон податоци
           <ArrowRight size={16} />

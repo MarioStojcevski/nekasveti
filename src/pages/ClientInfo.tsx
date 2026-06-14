@@ -26,30 +26,27 @@ const ClientInfo = () => {
 
   return (
     <div className="flex flex-col min-h-full pt-2 pb-4">
-      {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="font-display text-2xl sm:text-3xl text-white mb-1">
+        <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
           Твои Податоци
         </h1>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-text-400">
           Внесете ги вашите контакт информации
         </p>
       </div>
 
-      {/* Form */}
       <div className="space-y-4 flex-1">
-        {/* Name */}
-        <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4">
+        <div className="rounded-2xl bg-page-800 border border-page-500/50 p-4">
           <label className="flex items-center gap-2 mb-2">
-            <User size={14} className="text-gold-400" />
-            <span className="text-xs font-medium text-slate-400">Име и презиме *</span>
+            <User size={14} className="text-copper-400" />
+            <span className="text-xs font-medium text-text-400">Име и презиме *</span>
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="пр. Марио Стојчевски"
-            className="w-full bg-transparent text-base text-white outline-none placeholder:text-slate-600"
+            className="w-full bg-transparent text-base text-text-100 outline-none placeholder:text-text-500"
             autoComplete="name"
           />
           {name.length > 0 && !isNameValid && (
@@ -57,18 +54,17 @@ const ClientInfo = () => {
           )}
         </div>
 
-        {/* Phone */}
-        <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4">
+        <div className="rounded-2xl bg-page-800 border border-page-500/50 p-4">
           <label className="flex items-center gap-2 mb-2">
-            <Phone size={14} className="text-gold-400" />
-            <span className="text-xs font-medium text-slate-400">Телефон *</span>
+            <Phone size={14} className="text-copper-400" />
+            <span className="text-xs font-medium text-text-400">Телефон *</span>
           </label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="пр. 070 123 456"
-            className="w-full bg-transparent text-base text-white outline-none placeholder:text-slate-600"
+            className="w-full bg-transparent text-base text-text-100 outline-none placeholder:text-text-500"
             autoComplete="tel"
           />
           {phone.length > 0 && !isPhoneValid && (
@@ -76,34 +72,31 @@ const ClientInfo = () => {
           )}
         </div>
 
-        {/* Email (optional) */}
-        <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4">
+        <div className="rounded-2xl bg-page-800 border border-page-500/50 p-4">
           <label className="flex items-center gap-2 mb-2">
-            <Mail size={14} className="text-slate-500" />
-            <span className="text-xs font-medium text-slate-400">Email (опционално)</span>
+            <Mail size={14} className="text-text-500" />
+            <span className="text-xs font-medium text-text-400">Email (опционално)</span>
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="primer@email.com"
-            className="w-full bg-transparent text-base text-white outline-none placeholder:text-slate-600"
+            className="w-full bg-transparent text-base text-text-100 outline-none placeholder:text-text-500"
             autoComplete="email"
           />
         </div>
 
-        {/* Hint */}
-        <p className="text-xs text-slate-500 text-center px-4">
+        <p className="text-xs text-text-500 text-center px-4">
           Ќе ве контактираме на овој број за потврда на резервацијата
         </p>
       </div>
 
-      {/* Submit button */}
       <div className="pt-4 pb-4">
         <button
           onClick={handleSubmit}
           disabled={!isValid}
-          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 to-gold-400 text-dark-900 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           Продолжи кон преглед
           <ArrowRight size={16} />

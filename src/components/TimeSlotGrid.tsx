@@ -26,10 +26,10 @@ const TimeSlotGrid = ({
   const isBooked = (slot: string) => bookedSlots.includes(slot);
 
   return (
-    <div className="rounded-2xl bg-dark-800 border border-dark-600/50 p-4">
+    <div className="rounded-2xl bg-page-800 border border-page-500/50 p-4">
       <div className="flex items-center gap-2 mb-3">
-        <Clock size={16} className="text-gold-400" />
-        <h3 className="text-sm font-semibold text-white">Избери Време</h3>
+        <Clock size={16} className="text-copper-400" />
+        <h3 className="text-sm font-semibold text-text-100">Избери Време</h3>
       </div>
 
       <div className="grid grid-cols-4 gap-2">
@@ -44,10 +44,10 @@ const TimeSlotGrid = ({
               disabled={booked}
               className={`py-2.5 px-2 rounded-xl text-xs font-medium transition-all active:scale-95 ${
                 active
-                  ? "bg-gold-500 text-dark-900 font-semibold shadow-lg shadow-gold-500/20"
+                  ? "bg-copper-500 text-text-100 font-semibold shadow-lg shadow-copper-400/20"
                   : booked
-                  ? "bg-dark-600/50 text-slate-600 cursor-not-allowed line-through"
-                  : "bg-dark-700 text-slate-300 hover:bg-dark-600 hover:text-white"
+                  ? "bg-page-700/50 text-text-500 cursor-not-allowed line-through"
+                  : "bg-page-700 text-text-300 hover:bg-page-600 hover:text-text-100"
               }`}
             >
               {slot}

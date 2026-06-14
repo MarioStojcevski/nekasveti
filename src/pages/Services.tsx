@@ -3,7 +3,6 @@ import { Plus, Minus, ShoppingBag } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import allServices from "../utils/allServices";
 
-
 const getServiceImage = (serviceId: string): string => {
   const map: Record<string, string> = {
     "service2": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&q=80",
@@ -54,17 +53,15 @@ const Services = () => {
 
   return (
     <div className="flex flex-col min-h-full pt-2 pb-4">
-      {/* Header */}
       <div className="text-center mb-4">
-        <h1 className="font-display text-2xl sm:text-3xl text-white mb-1">
+        <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
           Избери Услуги
         </h1>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-text-400">
           Изберете услуги за хемиско чистење
         </p>
       </div>
 
-      {/* Grid */}
       <div className="flex-1 space-y-3 pb-24">
         {allServices.map((service) => {
           const selected = services.find((s) => s.id === service.id);
@@ -75,8 +72,8 @@ const Services = () => {
               key={service.id}
               className={`rounded-2xl overflow-hidden border transition-all duration-200 ${
                 qty > 0
-                  ? "border-gold-500/50 bg-dark-700 shadow-lg shadow-gold-500/10"
-                  : "border-dark-600/50 bg-dark-800"
+                  ? "border-copper-400/50 bg-page-700 shadow-lg shadow-copper-400/10"
+                  : "border-page-500/50 bg-page-800"
               }`}
             >
               <div className="flex gap-3 p-3">
@@ -89,33 +86,32 @@ const Services = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold text-white leading-tight truncate">
+                    <h3 className="text-sm sm:text-base font-semibold text-text-100 leading-tight truncate">
                       {service.name}
                     </h3>
-                    <span className="text-xs font-bold text-gold-400 whitespace-nowrap mt-0.5">
+                    <span className="text-xs font-bold text-copper-400 whitespace-nowrap mt-0.5">
                       {service.price} ден.
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-text-500 mt-1 line-clamp-2 leading-relaxed">
                     {service.description}
                   </p>
 
-                  {/* Quantity controls */}
                   <div className="flex items-center gap-2 mt-2.5">
                     {qty > 0 ? (
                       <>
                         <button
                           onClick={() => updateQuantity(service.id, false)}
-                          className="w-8 h-8 rounded-lg bg-dark-600 text-slate-400 hover:text-gold-400 flex items-center justify-center transition-colors active:scale-90"
+                          className="w-8 h-8 rounded-lg bg-page-600 text-text-400 hover:text-copper-400 flex items-center justify-center transition-colors active:scale-90"
                         >
                           <Minus size={14} />
                         </button>
-                        <span className="text-sm font-semibold text-white w-6 text-center">
+                        <span className="text-sm font-semibold text-text-100 w-6 text-center">
                           {qty}
                         </span>
                         <button
                           onClick={() => updateQuantity(service.id, true)}
-                          className="w-8 h-8 rounded-lg bg-dark-600 text-slate-400 hover:text-gold-400 flex items-center justify-center transition-colors active:scale-90"
+                          className="w-8 h-8 rounded-lg bg-page-600 text-text-400 hover:text-copper-400 flex items-center justify-center transition-colors active:scale-90"
                         >
                           <Plus size={14} />
                         </button>
@@ -123,7 +119,7 @@ const Services = () => {
                     ) : (
                       <button
                         onClick={() => updateQuantity(service.id, true)}
-                        className="text-xs font-medium text-gold-400 hover:text-gold-300 transition-colors"
+                        className="text-xs font-medium text-copper-400 hover:text-copper-300 transition-colors"
                       >
                         + Додади услуга
                       </button>
@@ -136,24 +132,23 @@ const Services = () => {
         })}
       </div>
 
-      {/* Sticky bottom bar */}
       <div className="fixed bottom-16 left-0 right-0 z-40 px-4 pb-2 max-w-lg mx-auto">
-        <div className="bg-dark-800/95 backdrop-blur-xl border border-dark-600/50 rounded-2xl p-3 shadow-xl">
+        <div className="bg-page-800/95 backdrop-blur-xl border border-page-500/50 rounded-2xl p-3 shadow-xl">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
-              <ShoppingBag size={16} className="text-gold-400" />
-              <span className="text-sm text-slate-400">
+              <ShoppingBag size={16} className="text-copper-400" />
+              <span className="text-sm text-text-400">
                 {totalItems} {totalItems === 1 ? "услуга" : "услуги"}
               </span>
             </div>
-            <span className="text-base font-bold text-gold-400">
+            <span className="text-base font-bold text-copper-400">
               {totalPrice} ден.
             </span>
           </div>
           <button
             onClick={() => navigate("/schedule")}
             disabled={services.length === 0}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-400 text-dark-900 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all"
           >
             Продолжи со избор на датум →
           </button>
