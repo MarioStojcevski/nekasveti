@@ -1,26 +1,40 @@
+"use client";
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { Lock, User, ArrowRight } from "lucide-react";
 
 const AdminLogin = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSubmitting(true);
 
-    const adminUser = import.meta.env.VITE_ADMIN_USERNAME || "admin";
-    const adminPass = import.meta.env.VITE_ADMIN_PASSWORD || "admin";
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (username === adminUser && password === adminPass) {
-      sessionStorage.setItem("admin_session", "true");
-      sessionStorage.setItem("admin_username", username);
-      navigate("/admin");
-    } else {
-      setError("Погрешно корисничко име или лозинка");
+      if (res.ok) {
+        const data = await res.json();
+        sessionStorage.setItem("admin_session", "true");
+        sessionStorage.setItem("admin_username", data.username ?? username);
+        router.push("/admin");
+      } else {
+        setError("Погрешно корисничко име или лозинка");
+      }
+    } catch {
+      setError("Грешка при најава. Обидете се повторно.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -65,12 +79,13 @@ const AdminLogin = () => {
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 text-center">{error}</p>
+            <p className="text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-xl px-4 py-2.5 text-center">{error}</p>
           )}
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            disabled={submitting}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Најави се
             <ArrowRight size={16} />

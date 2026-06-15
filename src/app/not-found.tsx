@@ -1,8 +1,10 @@
-import { useNavigate } from "react-router-dom";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Sparkles, Home } from "lucide-react";
 
 const NotFound = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] px-4 text-center">
@@ -21,7 +23,7 @@ const NotFound = () => {
       </p>
 
       <button
-        onClick={() => navigate("/")}
+        onClick={() => router.push("/")}
         className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-copper-400/20"
       >
         <Home size={16} />

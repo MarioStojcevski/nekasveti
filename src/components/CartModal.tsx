@@ -1,7 +1,10 @@
+"use client";
+
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import { getTotalPrice } from "../utils/pricing";
 
 const CartModal = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const { services, setServices } = useAppContext();
@@ -29,10 +32,7 @@ const CartModal = ({ open, onClose }: { open: boolean; onClose: () => void }) =>
     setServices(services.filter((s) => s.id !== id));
   };
 
-  const totalPrice = services.reduce(
-    (sum, s) => sum + s.price * (s.quantity || 1),
-    0
-  );
+  const totalPrice = getTotalPrice(services);
 
   return (
     <AnimatePresence>

@@ -1,11 +1,13 @@
+"use client";
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { User, Phone, Mail, ArrowRight } from "lucide-react";
-import PageBg from "../components/PageBg";
-import { useAppContext } from "../context/AppContext";
+import PageBg from "@/components/PageBg";
+import { useAppContext } from "@/context/AppContext";
 
 const ClientInfo = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { clientInfo, setClientInfo } = useAppContext();
   const [name, setName] = useState(clientInfo?.name || "");
   const [phone, setPhone] = useState(clientInfo?.phone || "");
@@ -22,7 +24,7 @@ const ClientInfo = () => {
       phone: phone.trim(),
       email: email.trim() || undefined,
     });
-    navigate("/summary");
+    router.push("/summary");
   };
 
   return (
@@ -52,7 +54,7 @@ const ClientInfo = () => {
             autoComplete="name"
           />
           {name.length > 0 && !isNameValid && (
-            <p className="text-xs text-red-400/70 mt-1">Внесете најмалку 2 карактери</p>
+            <p className="text-xs font-medium text-red-600 mt-1">Внесете најмалку 2 карактери</p>
           )}
         </div>
 
@@ -70,7 +72,7 @@ const ClientInfo = () => {
             autoComplete="tel"
           />
           {phone.length > 0 && !isPhoneValid && (
-            <p className="text-xs text-red-400/70 mt-1">Внесете валиден македонски телефон</p>
+            <p className="text-xs font-medium text-red-600 mt-1">Внесете валиден македонски телефон</p>
           )}
         </div>
 

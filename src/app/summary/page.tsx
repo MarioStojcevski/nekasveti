@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import {
   CheckCircle,
   CalendarDays,
@@ -10,13 +12,14 @@ import {
   Wallet,
   Loader2,
 } from "lucide-react";
-import PageBg from "../components/PageBg";
+import PageBg from "@/components/PageBg";
 import dayjs from "dayjs";
-import { useAppContext } from "../context/AppContext";
-import { supabase } from "../lib/supabase";
+import { useAppContext } from "@/context/AppContext";
+import { createBooking, type NewBooking } from "@/lib/bookings";
+import { getTotalPrice } from "@/utils/pricing";
 
 const Summary = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     services, calendarValue, timeValue,
     location, clientInfo, setBookingRef,
@@ -28,17 +31,32 @@ const Summary = () => {
     ? dayjs(calendarValue).format("DD MMMM YYYY")
     : null;
 
-  const totalPrice = services.reduce(
-    (sum, s) => sum + s.price * (s.quantity || 1),
-    0
+  const totalPrice = getTotalPrice(services);
+
+  // Every step must be filled before a booking can be created. State lives in
+  // memory only, so a page refresh on /summary clears it and would otherwise
+  // submit an empty (null) booking that the DB rejects with a not-null error.
+  const isComplete = Boolean(
+    services.length > 0 &&
+      calendarValue &&
+      timeValue &&
+      location?.address &&
+      clientInfo?.name &&
+      clientInfo?.phone
   );
 
   const handleConfirm = async () => {
     if (submitting) return;
+
+    if (!isComplete) {
+      setError("Недостасуваат податоци. Започнете ја резервацијата од почеток.");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
-    const bookingData = {
+    const booking: NewBooking = {
       date: calendarValue,
       time: timeValue,
       client_name: clientInfo?.name,
@@ -58,34 +76,17 @@ const Summary = () => {
     };
 
     try {
-      const { data: existing } = await supabase
-        .from("bookings")
-        .select("id")
-        .eq("date", calendarValue)
-        .eq("time", timeValue)
-        .maybeSingle();
-
-      if (existing) {
-        setError("Овој термин е веќе резервиран. Изберете друг датум или термин.");
-        setSubmitting(false);
-        return;
-      }
-
-      const { data, error: insertError } = await supabase
-        .from("bookings")
-        .insert([bookingData])
-        .select("ref")
-        .single();
-
-      if (insertError) throw insertError;
-
-      setBookingRef(data?.ref || null);
-      navigate("/confirmation");
+      const ref = await createBooking(booking);
+      setBookingRef(ref);
+      router.push("/confirmation");
     } catch (err: any) {
       console.error("Booking failed:", err);
-      if (err.message?.includes("Failed to fetch") || err.code === "PGRST301") {
+      if (err.code === "SLOT_TAKEN") {
+        setError("Овој термин е веќе резервиран. Изберете друг датум или термин.");
+        setSubmitting(false);
+      } else if (err.message?.includes("Failed to fetch")) {
         setBookingRef("DEMO-001");
-        navigate("/confirmation");
+        router.push("/confirmation");
       } else {
         setError("Неуспешно резервирање. Обидете се повторно.");
         setSubmitting(false);
@@ -207,14 +208,14 @@ const Summary = () => {
       </div>
 
       {error && (
-        <p className="text-sm text-red-400 text-center">{error}</p>
+        <p className="text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-xl px-4 py-2.5 text-center">{error}</p>
       )}
 
       <div className="pt-2 pb-4">
         <button
           onClick={handleConfirm}
-          disabled={submitting}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-bold text-sm disabled:opacity-50 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-copper-400/20"
+          disabled={submitting || !isComplete}
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xl shadow-copper-400/20"
         >
           {submitting ? (
             <>

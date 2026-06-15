@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "react-day-picker/style.css";
+@import "leaflet/dist/leaflet.css";
 
 @theme {
   --color-page-900: #f5f3f0;

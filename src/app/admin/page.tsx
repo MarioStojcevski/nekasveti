@@ -1,12 +1,18 @@
+"use client";
+
 import { useEffect, useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import {
   LogOut, Search, ChevronDown, Wallet, TrendingUp,
   Check, X, ChevronLeft, ChevronRight,
 } from "lucide-react";
-import { supabase } from "../lib/supabase";
-import type { Booking } from "../types";
+import {
+  fetchAllBookings,
+  updateBookingStatus,
+  type SortField,
+} from "@/lib/bookings";
+import type { Booking } from "@/types";
 import dayjs from "dayjs";
 
 const STATUS_OPTIONS = [
@@ -18,11 +24,11 @@ const STATUS_OPTIONS = [
 const PAGE_SIZE = 50;
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<"date" | "created_at">("date");
+  const [sortField, setSortField] = useState<SortField>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -34,7 +40,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const session = sessionStorage.getItem("admin_session");
     if (!session) {
-      navigate("/admin/login", { replace: true });
+      router.replace("/admin/login");
       return;
     }
     fetchBookings();
@@ -46,15 +52,13 @@ const AdminDashboard = () => {
 
   const fetchBookings = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .select("*")
-      .order(sortField, { ascending: sortDir === "asc" });
-
-    if (!error && data) {
-      setBookings(data as unknown as Booking[]);
+    try {
+      setBookings(await fetchAllBookings(sortField, sortDir === "asc"));
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const completedBookings = useMemo(
@@ -76,7 +80,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("admin_session");
-    navigate("/admin/login");
+    router.push("/admin/login");
   };
 
   const toggleSort = (field: "date" | "created_at") => {
@@ -88,25 +92,22 @@ const AdminDashboard = () => {
     }
   };
 
-  const updateStatus = async (id: string, status: string) => {
+  const updateStatus = async (id: string, status: Booking["status"]) => {
     setUpdatingId(id);
     setFeedback(null);
     setOpenDropdown(null);
 
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status })
-      .eq("id", id);
-
-    if (error) {
-      setFeedback({ id, ok: false });
-    } else {
+    try {
+      await updateBookingStatus(id, status);
       setFeedback({ id, ok: true });
       setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, status: status as Booking["status"] } : b))
+        prev.map((b) => (b.id === id ? { ...b, status } : b))
       );
+    } catch {
+      setFeedback({ id, ok: false });
+    } finally {
+      setUpdatingId(null);
     }
-    setUpdatingId(null);
   };
 
   const filtered = useMemo(() => {

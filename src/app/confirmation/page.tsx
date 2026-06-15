@@ -1,11 +1,13 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { Sparkles, Home } from "lucide-react";
-import PageBg from "../components/PageBg";
-import { useAppContext } from "../context/AppContext";
+import PageBg from "@/components/PageBg";
+import { useAppContext } from "@/context/AppContext";
 
 const Confirmation = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { bookingRef, resetAll } = useAppContext();
   const [visible, setVisible] = useState(false);
 
@@ -16,15 +18,15 @@ const Confirmation = () => {
 
   useEffect(() => {
     if (!bookingRef) {
-      navigate("/", { replace: true });
+      router.replace("/");
     }
-  }, [bookingRef, navigate]);
+  }, [bookingRef, router]);
 
   if (!bookingRef) return null;
 
   const handleHome = () => {
     resetAll();
-    navigate("/");
+    router.push("/");
   };
 
   return (
@@ -51,7 +53,7 @@ const Confirmation = () => {
         <h1 className="text-3xl sm:text-4xl text-text-100 mb-2 font-bold">
           Резервацијата е закажана!
         </h1>
-        <p className="text-base text-text-400 mb-6 max-w-xs mx-auto leading-relaxed">
+        <p className="text-base text-text-200 mb-6 max-w-xs mx-auto leading-relaxed font-medium">
           Нашиот тим ќе ве контактира на телефон за потврда.
           <br />
           Нашиот тим ќе биде на вашата адреса на закажаниот датум.

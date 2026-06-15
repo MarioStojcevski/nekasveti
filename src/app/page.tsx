@@ -1,6 +1,8 @@
-import { useNavigate } from "react-router-dom";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Sparkles, Zap, ShieldCheck, Target } from "lucide-react";
-import PageBg from "../components/PageBg";
+import PageBg from "@/components/PageBg";
 
 const features = [
   { icon: Zap, text: "Брзо и ефикасно", desc: "Закажи за 2 минути" },
@@ -9,7 +11,7 @@ const features = [
 ];
 
 const Home = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <PageBg image="funky">
@@ -23,7 +25,7 @@ const Home = () => {
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl text-text-100 text-center leading-tight mb-3 font-bold">
-          нека свети
+          mebelmaster
         </h1>
 
         <p className="text-base sm:text-lg text-text-400 text-center max-w-xs leading-relaxed mb-8">
@@ -33,7 +35,7 @@ const Home = () => {
         </p>
 
         <button
-          onClick={() => navigate("/services")}
+          onClick={() => router.push("/services")}
           className="w-full max-w-xs py-4 px-8 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-bold text-base shadow-lg shadow-copper-400/25 hover:shadow-xl hover:shadow-copper-400/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
         >
           Започни сега →

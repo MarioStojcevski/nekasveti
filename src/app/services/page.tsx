@@ -1,35 +1,28 @@
-import { useNavigate } from "react-router-dom";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Plus, Minus, ShoppingBag } from "lucide-react";
-import PageBg from "../components/PageBg";
-import { useAppContext } from "../context/AppContext";
-import allServices from "../utils/allServices";
-import foteljaImg from "../assets/services/fotelja.jpg";
-import dvosedImg from "../assets/services/dvosed.jpg";
-import trosedImg from "../assets/services/trosed.jpg";
-import petosedImg from "../assets/services/petosed.jpg";
-import sestosedImg from "../assets/services/sestosed.jpg";
-import sedmosedImg from "../assets/services/sedmosed.jpg";
-import stolImg from "../assets/services/stol.jpg";
-import taburetkaImg from "../assets/services/taburetka.jpg";
-import kancelariskiImg from "../assets/services/kancelariski.jpg";
-import dusekImg from "../assets/services/dusek.jpg";
+import PageBg from "@/components/PageBg";
+import { useAppContext } from "@/context/AppContext";
+import { getTotalItems, getTotalPrice } from "@/utils/pricing";
+import allServices from "@/utils/allServices";
 
 const serviceImages: Record<string, string> = {
-  s1: foteljaImg,
-  s2: dvosedImg,
-  s3: trosedImg,
-  s4: petosedImg,
-  s5: sestosedImg,
-  s6: sedmosedImg,
-  s7: stolImg,
-  s8: taburetkaImg,
-  s9: kancelariskiImg,
-  s10: dusekImg,
-  s11: dusekImg,
+  s1: "/assets/services/fotelja.jpg",
+  s2: "/assets/services/dvosed.jpg",
+  s3: "/assets/services/trosed.jpg",
+  s4: "/assets/services/petosed.jpg",
+  s5: "/assets/services/sestosed.jpg",
+  s6: "/assets/services/sedmosed.jpg",
+  s7: "/assets/services/stol.jpg",
+  s8: "/assets/services/taburetka.jpg",
+  s9: "/assets/services/kancelariski.jpg",
+  s10: "/assets/services/dusek.jpg",
+  s11: "/assets/services/dusek.jpg",
 };
 
 const Services = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { services, setServices } = useAppContext();
 
   const updateQuantity = (serviceId: string, increment: boolean) => {
@@ -60,8 +53,8 @@ const Services = () => {
     }
   };
 
-  const totalItems = services.reduce((sum, s) => sum + (s.quantity || 1), 0);
-  const totalPrice = services.reduce((sum, s) => sum + s.price * (s.quantity || 1), 0);
+  const totalItems = getTotalItems(services);
+  const totalPrice = getTotalPrice(services);
 
   return (
     <PageBg image="carpet">
@@ -157,7 +150,7 @@ const Services = () => {
             </span>
           </div>
           <button
-            onClick={() => navigate("/schedule")}
+            onClick={() => router.push("/schedule")}
             disabled={services.length === 0}
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all"
           >

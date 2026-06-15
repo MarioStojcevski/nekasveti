@@ -1,16 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingCart, Sparkles, Phone } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import { getTotalItems } from "../utils/pricing";
 
 const Header = ({ onCartOpen }: { onCartOpen: () => void }) => {
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname() ?? "";
+  const router = useRouter();
   const { services } = useAppContext();
 
-  const totalItems = services.reduce(
-    (total, service) => total + (service.quantity || 1),
-    0
-  );
+  const totalItems = getTotalItems(services);
 
   const isHome = pathname === "/";
   const isAdmin = pathname.startsWith("/admin");
@@ -22,7 +22,7 @@ const Header = ({ onCartOpen }: { onCartOpen: () => void }) => {
         <div className="flex items-center gap-2">
           {!isHome && !isAdmin && (
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => router.back()}
               className="flex items-center justify-center w-9 h-9 rounded-xl bg-page-700 text-text-400 hover:bg-page-600 hover:text-copper-400 transition-all active:scale-95"
               aria-label="Back"
             >
@@ -32,7 +32,7 @@ const Header = ({ onCartOpen }: { onCartOpen: () => void }) => {
           <div className="flex items-center gap-1.5">
             <Sparkles size={isHome ? 22 : 18} className="text-copper-400" />
             <span className="text-base sm:text-lg text-text-100 font-semibold tracking-wide">
-              нека свети
+              mebelmaster
             </span>
           </div>
         </div>

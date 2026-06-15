@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
-import Header from "./components/Header";
-import BottomNav from "./components/BottomNav";
-import CartModal from "./components/CartModal";
+"use client";
 
-const App = () => {
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Header from "./Header";
+import BottomNav from "./BottomNav";
+import CartModal from "./CartModal";
+
+const AppShell = ({ children }: { children: React.ReactNode }) => {
   const [cartOpen, setCartOpen] = useState(false);
-  const { pathname } = useLocation();
+  const pathname = usePathname() ?? "";
   const isHome = pathname === "/";
   const isConfirmation = pathname === "/confirmation";
   const isAdmin = pathname.startsWith("/admin");
@@ -20,7 +22,7 @@ const App = () => {
           isHome ? "pt-0" : "pt-14 sm:pt-16"
         } ${showBottomNav ? "pb-20" : "pb-6"} ${isAdmin ? "max-w-4xl" : ""}`}
       >
-        <Outlet />
+        {children}
       </main>
       <BottomNav />
       <CartModal open={cartOpen} onClose={() => setCartOpen(false)} />
@@ -28,4 +30,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default AppShell;

@@ -1,4 +1,6 @@
-import { useLocation, useNavigate } from "react-router-dom";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
 import { Package, Calendar, FileText, CheckCircle } from "lucide-react";
 
 const steps = [
@@ -9,8 +11,8 @@ const steps = [
 ];
 
 const BottomNav = () => {
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname() ?? "";
+  const router = useRouter();
 
   const isHome = pathname === "/";
   const isAdmin = pathname.startsWith("/admin");
@@ -47,7 +49,7 @@ const BottomNav = () => {
             <button
               key={step.path}
               onClick={() => {
-                if (i <= currentIndex + 1) navigate(step.path);
+                if (i <= currentIndex + 1) router.push(step.path);
               }}
               className="flex flex-col items-center gap-1 min-w-0 flex-1"
             >

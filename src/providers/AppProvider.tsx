@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useState, useCallback } from "react";
 import type { Service, ClientInfo } from "../types";
 import { AppContext } from "../context/AppContext";

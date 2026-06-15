@@ -1,15 +1,10 @@
-import { Sun, Moon } from "lucide-react";
+import { TIME_SLOTS } from "../utils/slots";
 
 type TimeSlotGridProps = {
   selectedTime: string | null;
   onSelect: (time: string) => void;
   bookedSlots?: string[];
 };
-
-const SLOTS = [
-  { value: "09:00 - 13:00", label: "Претпладне", icon: Sun },
-  { value: "13:00 - 17:00", label: "Попладне", icon: Moon },
-];
 
 const TimeSlotGrid = ({
   selectedTime,
@@ -23,7 +18,7 @@ const TimeSlotGrid = ({
       </h3>
 
       <div className="grid grid-cols-2 gap-3">
-        {SLOTS.map(({ value, label, icon: Icon }) => {
+        {TIME_SLOTS.map(({ value, label, icon: Icon }) => {
           const booked = bookedSlots.includes(value);
           const active = selectedTime === value;
 
