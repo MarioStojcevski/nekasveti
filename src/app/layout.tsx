@@ -47,7 +47,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="mk" className={poppins.variable}>
-      <body>
+      <body suppressHydrationWarning>
         <AppProvider>
           <AppShell>{children}</AppShell>
         </AppProvider>
