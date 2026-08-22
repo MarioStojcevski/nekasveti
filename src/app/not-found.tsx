@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Sparkles, Home } from "lucide-react";
+import Image from "next/image";
+import { Home } from "lucide-react";
 
 const NotFound = () => {
   const router = useRouter();
@@ -10,8 +11,8 @@ const NotFound = () => {
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] px-4 text-center">
       <div className="relative mb-6">
         <div className="absolute inset-0 bg-copper-400/20 blur-3xl rounded-full w-20 h-20 -top-4 -left-4 animate-pulse" />
-        <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-copper-400 to-copper-600 flex items-center justify-center shadow-xl shadow-copper-400/20">
-          <Sparkles size={26} className="text-text-100" />
+        <div className="relative w-14 h-14 rounded-2xl bg-page-800 border border-page-500/60 flex items-center justify-center shadow-xl shadow-copper-400/10 overflow-hidden">
+          <Image src="/assets/logo.png" alt="mebelmajstor" width={38} height={38} priority />
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Plus, Minus, ShoppingBag } from "lucide-react";
 import PageBg from "@/components/PageBg";
 import { useAppContext } from "@/context/AppContext";
@@ -58,7 +59,7 @@ const Services = () => {
 
   return (
     <PageBg image="carpet">
-    <div className="flex flex-col min-h-full pt-2 pb-4">
+    <div className="flex flex-col min-h-full pt-6 sm:pt-8 pb-4">
       <div className="text-center mb-4">
         <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
           Избери Услуги
@@ -84,9 +85,12 @@ const Services = () => {
             >
               <div className="flex gap-3 p-3">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-page-600">
-                  <img
+                  <Image
                     src={serviceImages[service.id]}
                     alt={service.name}
+                    width={96}
+                    height={96}
+                    sizes="96px"
                     className="w-full h-full object-cover"
                   />
                 </div>

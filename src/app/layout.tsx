@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import AppProvider from "@/providers/AppProvider";
 import AppShell from "@/components/AppShell";
+import LegacyServiceWorkerCleanup from "@/components/LegacyServiceWorkerCleanup";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -11,8 +12,9 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const SITE_NAME = "mebelmaster";
-const SITE_DESCRIPTION = "Професионално хемиско чистење. Закажи за 2 минути.";
+const SITE_NAME = "mebelmajstor";
+const SITE_SLOGAN = "Мебел мајстор - мајстори за мебел";
+const SITE_DESCRIPTION = `${SITE_SLOGAN}. Професионално хемиско чистење. Закажи за 2 минути.`;
 
 export const metadata: Metadata = {
   title: {
@@ -22,10 +24,10 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text x='0' y='25' font-size='25'>✨</text></svg>",
+    icon: "/assets/logo.png",
   },
   openGraph: {
-    title: `${SITE_NAME} - Професионално хемиско чистење`,
+    title: `${SITE_NAME} - ${SITE_SLOGAN}`,
     description: SITE_DESCRIPTION,
     type: "website",
     locale: "mk_MK",
@@ -48,6 +50,7 @@ export default function RootLayout({
   return (
     <html lang="mk" className={poppins.variable}>
       <body suppressHydrationWarning>
+        <LegacyServiceWorkerCleanup />
         <AppProvider>
           <AppShell>{children}</AppShell>
         </AppProvider>

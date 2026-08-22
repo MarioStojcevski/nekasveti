@@ -12,7 +12,9 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
   const isHome = pathname === "/";
   const isConfirmation = pathname === "/confirmation";
   const isAdmin = pathname.startsWith("/admin");
-  const showBottomNav = !isHome && !isConfirmation && !isAdmin;
+  const isGallery = pathname.startsWith("/gallery");
+  const showBottomNav =
+    !isHome && !isConfirmation && !isAdmin && !isGallery;
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
@@ -20,7 +22,9 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       <main
         className={`flex-1 w-full max-w-lg mx-auto px-4 ${
           isHome ? "pt-0" : "pt-14 sm:pt-16"
-        } ${showBottomNav ? "pb-20" : "pb-6"} ${isAdmin ? "max-w-4xl" : ""}`}
+        } ${showBottomNav ? "pb-20" : "pb-6"} ${
+          isAdmin ? "sm:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl" : ""
+        }`}
       >
         {children}
       </main>

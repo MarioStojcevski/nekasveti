@@ -96,7 +96,7 @@ const Summary = () => {
 
   return (
     <PageBg image="office">
-    <div className="flex flex-col gap-3 pt-2 pb-4">
+    <div className="flex flex-col gap-3 pt-6 sm:pt-8 pb-4">
       <div className="text-center mb-1">
         <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
           Преглед

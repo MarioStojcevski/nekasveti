@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Home } from "lucide-react";
+import Image from "next/image";
+import { Home } from "lucide-react";
 import PageBg from "@/components/PageBg";
 import { useAppContext } from "@/context/AppContext";
 
@@ -39,8 +40,8 @@ const Confirmation = () => {
       >
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-copper-400/30 blur-3xl rounded-full w-32 h-32 -top-4 -left-4" />
-          <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-copper-400 to-copper-600 flex items-center justify-center shadow-xl shadow-copper-400/30 animate-pulse-glow">
-            <Sparkles size={40} className="text-text-100" />
+          <div className="relative w-24 h-24 rounded-full bg-page-800 border border-page-500/60 flex items-center justify-center shadow-xl shadow-copper-400/20 animate-pulse-glow">
+            <Image src="/assets/logo.png" alt="mebelmajstor" width={56} height={56} priority />
           </div>
         </div>
       </div>
@@ -54,9 +55,8 @@ const Confirmation = () => {
           Резервацијата е закажана!
         </h1>
         <p className="text-base text-text-200 mb-6 max-w-xs mx-auto leading-relaxed font-medium">
-          Нашиот тим ќе ве контактира на телефон за потврда.
-          <br />
-          Нашиот тим ќе биде на вашата адреса на закажаниот датум.
+          Нашиот тим ќе ве контактира на телефон за потврда и ќе дојде на
+          вашата адреса на закажаниот датум.
         </p>
       </div>
 

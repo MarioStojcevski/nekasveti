@@ -29,7 +29,7 @@ const ClientInfo = () => {
 
   return (
     <PageBg image="caffee">
-    <div className="flex flex-col min-h-full pt-2 pb-4">
+    <div className="flex flex-col min-h-full pt-6 sm:pt-8 pb-4">
       <div className="text-center mb-6">
         <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
           Твои Податоци

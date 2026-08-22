@@ -2,13 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Package, Calendar, FileText, CheckCircle } from "lucide-react";
+import { bookingSteps } from "../utils/bookingFlow";
 
-const steps = [
-  { path: "/services", label: "Услуги", icon: Package },
-  { path: "/schedule", label: "Термин", icon: Calendar },
-  { path: "/client-info", label: "Податоци", icon: FileText },
-  { path: "/summary", label: "Преглед", icon: CheckCircle },
-];
+const stepIcons = [Package, Calendar, FileText, CheckCircle];
 
 const BottomNav = () => {
   const pathname = usePathname() ?? "";
@@ -20,14 +16,16 @@ const BottomNav = () => {
 
   if (isHome || isConfirmation || isAdmin) return null;
 
-  const currentIndex = steps.findIndex((s) => pathname.startsWith(s.path));
+  const currentIndex = bookingSteps.findIndex((s) =>
+    pathname.startsWith(s.path)
+  );
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
       <div className="absolute inset-0 bg-page-900/90 backdrop-blur-xl border-t border-page-500/50" />
       <div className="relative flex items-center justify-around h-16 max-w-lg mx-auto px-4">
-        {steps.map((step, i) => {
-          const Icon = step.icon;
+        {bookingSteps.map((step, i) => {
+          const Icon = stepIcons[i];
           const isActive = i === currentIndex;
           const isPast = i < currentIndex;
 

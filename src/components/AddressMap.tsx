@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MapPin, Info } from "lucide-react";
 import L from "leaflet";
 
@@ -31,6 +31,27 @@ const AddressMap = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState(location?.address || "");
   const [searching, setSearching] = useState(false);
+
+  const onLocationChangeRef = useRef(onLocationChange);
+  useEffect(() => {
+    onLocationChangeRef.current = onLocationChange;
+  }, [onLocationChange]);
+
+  const reverseGeocode = useCallback(async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+        { headers: { "Accept-Language": "mk" } }
+      );
+      const data = await res.json();
+      const address = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      setSearchQuery(address);
+      onLocationChangeRef.current({ lat, lng, address });
+    } catch {
+      setSearchQuery(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+      onLocationChangeRef.current({ lat, lng, address: `${lat.toFixed(4)}, ${lng.toFixed(4)}` });
+    }
+  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -75,23 +96,8 @@ const AddressMap = ({
       mapRef.current = null;
       markerRef.current = null;
     };
-  }, []);
-
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
-        { headers: { "Accept-Language": "mk" } }
-      );
-      const data = await res.json();
-      const address = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      setSearchQuery(address);
-      onLocationChange({ lat, lng, address });
-    } catch {
-      setSearchQuery(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-      onLocationChange({ lat, lng, address: `${lat.toFixed(4)}, ${lng.toFixed(4)}` });
-    }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- map initializes once; position is controlled imperatively via the marker
+  }, [reverseGeocode]);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;

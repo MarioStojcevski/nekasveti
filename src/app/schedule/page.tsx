@@ -80,7 +80,7 @@ const Schedule = () => {
 
   return (
     <PageBg image="balcony">
-    <div className="flex flex-col h-full pt-2">
+    <div className="flex flex-col h-full pt-6 sm:pt-8">
       <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden pb-28 space-y-3 px-0">
         <div className="text-center mb-1">
           <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">

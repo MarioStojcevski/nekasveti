@@ -173,6 +173,16 @@ input, select, textarea {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.animate-rise {
+  animation: fade-in-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise {
+    animation: none;
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 20px rgba(232, 133, 74, 0.2); }
   50% { box-shadow: 0 0 40px rgba(232, 133, 74, 0.4); }
@@ -181,3 +191,9 @@ input, select, textarea {
 /* Scrollbar hidden */
 ::-webkit-scrollbar { width: 0; background: transparent; }
 * { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* Admin table scrollbar visible */
+.scrollbar-visible::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+.scrollbar-visible::-webkit-scrollbar-thumb { background: var(--color-copper-400); border-radius: 3px; }
+.scrollbar-visible::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-visible { scrollbar-width: thin; scrollbar-color: var(--color-copper-400) transparent; }
