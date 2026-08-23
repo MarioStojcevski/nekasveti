@@ -1,13 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Service, ClientInfo } from "../types";
-
-type Location = {
-  lat: number;
-  lng: number;
-  address: string;
-};
+import type { Service, Location, ClientInfo } from "../types";
 
 type AppContextType = {
   services: Service[];

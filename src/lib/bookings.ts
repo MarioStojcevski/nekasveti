@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { supabase } from "./supabase";
-import type { Booking, NewBooking } from "../types";
+import type { Booking, NewBooking, BookingStatus } from "../types";
 import { toDateKey } from "../utils/date";
 
 export type { NewBooking };
@@ -58,24 +58,26 @@ export const createBooking = async (booking: NewBooking): Promise<string | null>
   return data?.ref ?? null;
 };
 
-/** Every booking, sorted by the given field/direction (admin view). */
+/** Every booking, sorted by the given field/direction (admin view, server-side). */
 export const fetchAllBookings = async (
   sortField: SortField,
   ascending: boolean
 ): Promise<Booking[]> => {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .select("*")
-    .order(sortField, { ascending });
-
-  if (error) throw error;
-  return (data ?? []) as unknown as Booking[];
+  const params = new URLSearchParams({ sort: sortField, asc: ascending ? "1" : "0" });
+  const res = await fetch(`/api/admin/bookings?${params}`);
+  if (!res.ok) throw new Error("Failed to fetch bookings");
+  return res.json();
 };
 
+/** Update a booking's status (admin, server-side). */
 export const updateBookingStatus = async (
   id: string,
-  status: Booking["status"]
+  status: BookingStatus
 ): Promise<void> => {
-  const { error } = await supabase.from(TABLE).update({ status }).eq("id", id);
-  if (error) throw error;
+  const res = await fetch("/api/admin/bookings", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status }),
+  });
+  if (!res.ok) throw new Error("Failed to update status");
 };

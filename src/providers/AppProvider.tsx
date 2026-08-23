@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
-import type { Service, ClientInfo } from "../types";
+import type { Service, Location, ClientInfo } from "../types";
 import { AppContext } from "../context/AppContext";
 
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [calendarValue, setCalendarValue] = useState<string | null>(null);
   const [timeValue, setTimeValue] = useState<string | null>(null);
-  const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
+  const [location, setLocation] = useState<Location | null>(null);
   const [clientInfo, setClientInfo] = useState<ClientInfo | null>(null);
   const [bookingRef, setBookingRef] = useState<string | null>(null);
 

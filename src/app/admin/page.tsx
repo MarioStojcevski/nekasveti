@@ -7,6 +7,7 @@ import {
   LogOut, Search, ChevronDown, Wallet, TrendingUp,
   ChevronLeft, ChevronRight,
   Clock, CheckCircle, XCircle, LoaderCircle,
+  RefreshCw, X, Package, Images,
 } from "lucide-react";
 import {
   fetchAllBookings,
@@ -29,8 +30,9 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortField, setSortField] = useState<SortField>("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [page, setPage] = useState(1);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
@@ -90,6 +92,22 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     sessionStorage.removeItem("admin_session");
     router.push("/admin/login");
+  };
+
+  const handleRefresh = () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setPage(1);
+    void (async () => {
+      try {
+        const data = await fetchAllBookings(sortField, sortDir === "asc");
+        setBookings(data);
+      } catch (err) {
+        console.error("Failed to refresh bookings:", err);
+      } finally {
+        setRefreshing(false);
+      }
+    })();
   };
 
   const toggleSort = (field: "date" | "created_at") => {
@@ -174,13 +192,29 @@ const AdminDashboard = () => {
         <h1 className="text-2xl font-bold text-text-100">
           здраво, {sessionStorage.getItem("admin_username") || "admin"}
         </h1>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-page-700 text-text-400 hover:text-copper-400 hover:bg-page-600 transition-colors text-sm"
-        >
-          <LogOut size={15} />
-          Одјава
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push("/admin/products")}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-page-700 text-text-400 hover:text-copper-400 hover:bg-page-600 transition-colors text-sm"
+          >
+            <Package size={15} />
+            Производи
+          </button>
+          <button
+            onClick={() => router.push("/admin/gallery")}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-page-700 text-text-400 hover:text-copper-400 hover:bg-page-600 transition-colors text-sm"
+          >
+            <Images size={15} />
+            Галерија
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-page-700 text-text-400 hover:text-copper-400 hover:bg-page-600 transition-colors text-sm"
+          >
+            <LogOut size={15} />
+            Одјава
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">
@@ -200,15 +234,24 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="relative mb-4">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-500" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Пребарај по име, телефон или референца..."
-          className="w-full bg-page-800 border border-page-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-text-100 outline-none placeholder:text-text-500"
-        />
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-500" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Пребарај по име, телефон или референца..."
+            className="w-full bg-page-800 border border-page-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-text-100 outline-none placeholder:text-text-500"
+          />
+        </div>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center justify-center w-12 shrink-0 rounded-xl bg-page-800 border border-page-500/50 text-text-400 hover:text-copper-400 hover:bg-page-700 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+        </button>
       </div>
 
       <div className="relative overflow-x-auto rounded-2xl bg-page-800 border border-page-500/50 scrollbar-visible">
@@ -217,7 +260,19 @@ const AdminDashboard = () => {
             <tr className="border-b border-page-500/50">
               <th className="text-left py-3 px-4 text-text-400 font-medium whitespace-nowrap">Ref</th>
               <th className="text-left py-3 px-4 text-text-400 font-medium">Име</th>
-              <th className="text-left py-3 px-4 text-text-400 font-medium whitespace-nowrap">Телефон</th>              <th
+              <th className="text-left py-3 px-4 text-text-400 font-medium whitespace-nowrap">Телефон</th>
+              <th
+                className="text-left py-3 px-4 text-text-400 font-medium cursor-pointer hover:text-text-100 select-none whitespace-nowrap"
+                onClick={() => toggleSort("created_at")}
+              >
+                <span className="flex items-center gap-1">
+                  Креирано
+                  {sortField === "created_at" && (
+                    <ChevronDown size={12} className={`transition-transform ${sortDir === "asc" ? "rotate-180" : ""}`} />
+                  )}
+                </span>
+              </th>
+              <th
                 className="text-left py-3 px-4 text-text-400 font-medium cursor-pointer hover:text-text-100 select-none whitespace-nowrap"
                 onClick={() => toggleSort("date")}
               >
@@ -237,16 +292,19 @@ const AdminDashboard = () => {
           <tbody>
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-10 text-text-500">
+                <td colSpan={9} className="text-center py-10 text-text-500">
                   Нема резервации
                 </td>
               </tr>
             ) : (
               paginated.map((b) => (
-                <tr key={b.id} className="border-b border-page-500/30 hover:bg-page-700/50 transition-colors">
+                <tr key={b.id} className="border-b border-page-500/30 hover:bg-page-700/50 transition-colors cursor-pointer" onClick={() => setSelectedBooking(b)}>
                   <td className="py-3 px-4 text-copper-400 font-mono text-xs whitespace-nowrap">{b.ref}</td>
                   <td className="py-3 px-4 text-text-100 font-medium">{b.client_name}</td>
                   <td className="py-3 px-4 text-text-400 whitespace-nowrap">{b.client_phone}</td>
+                  <td className="py-3 px-4 text-text-300 text-xs whitespace-nowrap">
+                    {dayjs(b.created_at).format("DD.MM.YY HH:mm")}
+                  </td>
                   <td className="py-3 px-4 text-text-300 whitespace-nowrap">
                     {dayjs(b.date).format("DD.MM.YYYY")}
                   </td>
@@ -264,7 +322,7 @@ const AdminDashboard = () => {
                   <td className="py-3 px-4 text-text-100 font-semibold whitespace-nowrap">{b.total_price} ден.</td>
                   <td className="sticky right-0 z-10 py-3 px-4 bg-page-800 border-l border-page-500/50 shadow-[-8px_0_12px_-8px_rgba(26,26,26,0.08)]">
                     <button
-                      onClick={(e) => handleStatusClick(b.id, e)}
+                      onClick={(e) => { e.stopPropagation(); handleStatusClick(b.id, e); }}
                       disabled={updatingId === b.id}
                       className={`flex items-center justify-center gap-1.5 w-28 px-2 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                         updatingId === b.id ? "opacity-60" : ""
@@ -357,6 +415,80 @@ const AdminDashboard = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {selectedBooking && createPortal(
+        <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setSelectedBooking(null)} />
+          <div className="relative w-full sm:max-w-lg max-h-[85vh] overflow-y-auto bg-page-800 border border-page-500/50 rounded-t-2xl sm:rounded-2xl shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-page-800 border-b border-page-500/50">
+              <div>
+                <p className="text-sm font-bold text-text-100">{selectedBooking.client_name}</p>
+                <p className="text-xs text-text-400 font-mono">{selectedBooking.ref}</p>
+              </div>
+              <button
+                onClick={() => setSelectedBooking(null)}
+                className="p-1.5 rounded-lg hover:bg-page-700 text-text-400 hover:text-text-100 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="px-5 py-4 space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-text-500">Телефон</span>
+                  <p className="text-text-200 font-medium">{selectedBooking.client_phone}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-text-500">Статус</span>
+                  <p className={`inline-block self-start px-2 py-0.5 rounded-md text-xs font-medium ${statusBadge(selectedBooking.status)}`}>
+                    {statusLabel(selectedBooking.status)}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-text-500">Датум</span>
+                  <p className="text-text-200 font-medium">{dayjs(selectedBooking.date).format("DD.MM.YYYY")}</p>
+                </div>
+                <div>
+                  <span className="text-text-500">Време</span>
+                  <p className="text-text-200 font-medium">{selectedBooking.time}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-text-500">Адреса</span>
+                  <p className="text-text-200 font-medium">{selectedBooking.address}</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-text-300 uppercase tracking-wide mb-2">Предмети за чистење</h3>
+                {selectedBooking.services && selectedBooking.services.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {selectedBooking.services.map((s, i) => (
+                      <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl bg-page-700/60 border border-page-500/30">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-md bg-copper-400/15 text-copper-400 text-[10px] font-bold flex items-center justify-center">
+                            {s.quantity || 1}
+                          </span>
+                          <span className="text-sm text-text-100">{s.name}</span>
+                        </div>
+                        <span className="text-xs text-text-300 font-medium">{s.price.toLocaleString("mk-MK")} ден.</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-text-500 italic">Нема податоци за предмети</p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-page-500/30">
+                <span className="text-xs text-text-400">Вкупно</span>
+                <span className="text-lg font-bold text-copper-400">{selectedBooking.total_price.toLocaleString("mk-MK")} ден.</span>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -3,12 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MapPin, Info } from "lucide-react";
 import L from "leaflet";
-
-type Location = {
-  lat: number;
-  lng: number;
-  address: string;
-};
+import type { Location } from "@/types";
 
 const defaultCenter: [number, number] = [41.9973, 21.4280];
 

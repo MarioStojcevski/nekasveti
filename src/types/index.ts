@@ -1,8 +1,23 @@
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  sort_order: number;
+  image_url: string | null;
+  created_at: string;
+};
+
 type Service = {
   id: string;
   name: string;
   price: number;
   quantity?: number;
+};
+
+type Location = {
+  lat: number;
+  lng: number;
+  address: string;
 };
 
 type ClientInfo = {
@@ -45,4 +60,11 @@ type NewBooking = {
   status: BookingStatus;
 };
 
-export type { Service, ClientInfo, Booking, BookingStatus, NewBooking };
+type GalleryImage = {
+  id: string;
+  image_url: string;
+  sort_order: number;
+  created_at: string;
+};
+
+export type { Product, Service, Location, ClientInfo, Booking, BookingStatus, NewBooking, GalleryImage };

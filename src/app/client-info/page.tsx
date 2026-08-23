@@ -49,7 +49,7 @@ const ClientInfo = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="пр. Марио Стојчевски"
+            placeholder="пр. Петар Петровски"
             className="w-full bg-transparent text-base text-text-100 outline-none placeholder:text-text-500"
             autoComplete="name"
           />

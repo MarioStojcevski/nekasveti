@@ -1,30 +1,37 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Plus, Minus, ShoppingBag } from "lucide-react";
+import { Plus, Minus, ShoppingBag, LoaderCircle } from "lucide-react";
 import PageBg from "@/components/PageBg";
 import { useAppContext } from "@/context/AppContext";
 import { getTotalItems, getTotalPrice } from "@/utils/pricing";
-import allServices from "@/utils/allServices";
+import { fetchProducts } from "@/lib/products";
+import type { Product } from "@/types";
 
-const serviceImages: Record<string, string> = {
-  s1: "/assets/services/fotelja.jpg",
-  s2: "/assets/services/dvosed.jpg",
-  s3: "/assets/services/trosed.jpg",
-  s4: "/assets/services/petosed.jpg",
-  s5: "/assets/services/sestosed.jpg",
-  s6: "/assets/services/sedmosed.jpg",
-  s7: "/assets/services/stol.jpg",
-  s8: "/assets/services/taburetka.jpg",
-  s9: "/assets/services/kancelariski.jpg",
-  s10: "/assets/services/dusek.jpg",
-  s11: "/assets/services/dusek.jpg",
-};
+const DEFAULT_IMAGE = "/assets/services/stol.jpg";
 
 const Services = () => {
   const router = useRouter();
   const { services, setServices } = useAppContext();
+  const [allServices, setAllServices] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      try {
+        const data = await fetchProducts();
+        if (active) setAllServices(data);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   const updateQuantity = (serviceId: string, increment: boolean) => {
     const svc = allServices.find((s) => s.id === serviceId);
@@ -57,6 +64,16 @@ const Services = () => {
   const totalItems = getTotalItems(services);
   const totalPrice = getTotalPrice(services);
 
+  if (loading) {
+    return (
+      <PageBg image="carpet">
+        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+          <LoaderCircle size={28} className="text-copper-400 animate-spin" />
+        </div>
+      </PageBg>
+    );
+  }
+
   return (
     <PageBg image="carpet">
     <div className="flex flex-col min-h-full pt-6 sm:pt-8 pb-4">
@@ -86,7 +103,7 @@ const Services = () => {
               <div className="flex gap-3 p-3">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-page-600">
                   <Image
-                    src={serviceImages[service.id]}
+                    src={service.image_url || DEFAULT_IMAGE}
                     alt={service.name}
                     width={96}
                     height={96}

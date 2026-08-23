@@ -13,8 +13,9 @@ const BottomNav = () => {
   const isHome = pathname === "/";
   const isAdmin = pathname.startsWith("/admin");
   const isConfirmation = pathname === "/confirmation";
+  const isGallery = pathname.startsWith("/gallery");
 
-  if (isHome || isConfirmation || isAdmin) return null;
+  if (isHome || isConfirmation || isAdmin || isGallery) return null;
 
   const currentIndex = bookingSteps.findIndex((s) =>
     pathname.startsWith(s.path)

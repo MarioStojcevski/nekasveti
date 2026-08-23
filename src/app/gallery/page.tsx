@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import PageBg from "@/components/PageBg";
+import GalleryGrid from "./GalleryGrid";
 
 export const metadata: Metadata = {
   title: "Галерија",
@@ -7,9 +9,16 @@ export const metadata: Metadata = {
     "Погледнете ја нашата работа - професионално хемиско чистење на мебел од mebelmajstor.",
 };
 
-const GALLERY_SIZE = 12;
+export const dynamic = "force-dynamic";
 
-const Gallery = () => {
+const Gallery = async () => {
+  const { data } = await supabaseAdmin
+    .from("gallery_images")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  const images = data ?? [];
+
   return (
     <PageBg image="balcony">
       <div className="flex flex-col min-h-full pt-6 sm:pt-8 pb-6">
@@ -22,14 +31,7 @@ const Gallery = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {Array.from({ length: GALLERY_SIZE }, (_, i) => (
-            <div
-              key={i}
-              className="aspect-square rounded-2xl bg-page-700 border border-page-500/50 animate-pulse"
-            />
-          ))}
-        </div>
+        <GalleryGrid images={images} />
       </div>
     </PageBg>
   );

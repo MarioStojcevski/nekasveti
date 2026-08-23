@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { DayPicker } from "react-day-picker";
@@ -29,14 +29,12 @@ const Schedule = () => {
     useAppContext();
   const [monthlySlots, setMonthlySlots] = useState<BookingSlot[]>([]);
   const [month, setMonth] = useState<Date>(new Date());
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let active = true;
     fetchMonthlySlots(month)
       .then((slots) => active && setMonthlySlots(slots))
-      .catch((error) => {
-        console.error("Failed to fetch monthly bookings:", error);
+      .catch(() => {
         if (active) setMonthlySlots([]);
       });
     return () => {
@@ -81,7 +79,7 @@ const Schedule = () => {
   return (
     <PageBg image="balcony">
     <div className="flex flex-col h-full pt-6 sm:pt-8">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden pb-28 space-y-3 px-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-28 space-y-3 px-0">
         <div className="text-center mb-1">
           <h1 className="text-2xl sm:text-3xl text-text-100 mb-1 font-bold">
             Избери Термин

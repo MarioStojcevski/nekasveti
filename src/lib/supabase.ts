@@ -13,5 +13,3 @@ export const supabase = createClient(
   supabaseUrl || "https://placeholder.supabase.co",
   supabaseKey || "placeholder"
 );
-
-export type { Booking } from "../types";

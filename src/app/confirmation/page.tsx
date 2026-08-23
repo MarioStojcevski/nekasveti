@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Home } from "lucide-react";
+import { Home, Images } from "lucide-react";
 import PageBg from "@/components/PageBg";
 import { useAppContext } from "@/context/AppContext";
 
 const Confirmation = () => {
   const router = useRouter();
-  const { bookingRef, resetAll } = useAppContext();
+  const { bookingRef } = useAppContext();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,6 @@ const Confirmation = () => {
   if (!bookingRef) return null;
 
   const handleHome = () => {
-    resetAll();
     router.push("/");
   };
 
@@ -78,13 +77,22 @@ const Confirmation = () => {
           visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
       >
-        <button
-          onClick={handleHome}
-          className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-copper-400/20"
-        >
-          <Home size={16} />
-          Почетна страна
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleHome}
+            className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-copper-500 to-copper-400 text-text-100 font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-copper-400/20"
+          >
+            <Home size={16} />
+            Почетна страна
+          </button>
+          <button
+            onClick={() => router.push("/gallery")}
+            className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-page-800 border border-page-500/50 text-text-200 font-semibold text-sm hover:text-copper-400 hover:border-copper-400/50 transition-all"
+          >
+            <Images size={16} />
+            Галерија
+          </button>
+        </div>
       </div>
     </div>
     </PageBg>

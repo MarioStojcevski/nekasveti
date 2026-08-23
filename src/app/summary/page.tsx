@@ -23,6 +23,7 @@ const Summary = () => {
   const {
     services, calendarValue, timeValue,
     location, clientInfo, setBookingRef,
+    setServices, setCalendarValue, setTimeValue, setLocation, setClientInfo,
   } = useAppContext();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,15 +79,17 @@ const Summary = () => {
     try {
       const ref = await createBooking(booking);
       setBookingRef(ref);
+      setServices([]);
+      setCalendarValue(null);
+      setTimeValue(null);
+      setLocation(null);
+      setClientInfo(null);
       router.push("/confirmation");
-    } catch (err: any) {
-      console.error("Booking failed:", err);
-      if (err.code === "SLOT_TAKEN") {
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
+      if (error.code === "SLOT_TAKEN") {
         setError("Овој термин е веќе резервиран. Изберете друг датум или термин.");
         setSubmitting(false);
-      } else if (err.message?.includes("Failed to fetch")) {
-        setBookingRef("DEMO-001");
-        router.push("/confirmation");
       } else {
         setError("Неуспешно резервирање. Обидете се повторно.");
         setSubmitting(false);
